@@ -1,18 +1,28 @@
 import mongoose from "mongoose";
+import DriverProfile from "./DriverProfile.js";
+import parentProfile from "./parentProfile.js";
 
 const userSchema = new mongoose.Schema({
   name: { 
     type: String, 
-    required: true 
+    required: true,
+    trim: true
   },
   email: { 
     type: String, 
     required: true, 
-    unique: true 
+    unique: true,
+    match: [/\S+@\S+\.\S+/, 'Please use a valid email address.'],
+    lowercase: true,
+    trim: true,
+    index: true
   },
   phone_number: { 
     type: String, 
-    default: '' 
+    required: true,
+    unique: true,
+    match: [/^\d{10}$/, 'Please use a valid 10-digit phone number.'],
+    index: true
   },
   password: { 
     type: String, 
@@ -20,48 +30,16 @@ const userSchema = new mongoose.Schema({
   },
   role: { 
     type: String, 
-    enum: ['parent', 'driver', 'admin'], 
-    default: 'parent', 
-    required: true 
+    enum: ['parent', 'driver', 'admin'],
+    required: true,
+    index: true
   },
 
   // profile fields
   preferred_language: { 
     type: String, 
+    enum: ['English', 'Hindi'],
     default: 'English' 
-  },
-  profile_photo: { 
-    type: String, 
-    default: '' 
-  },
-
-  // Parent-specific
-  pickup_address: { 
-    type: String, 
-    default: '' 
-  },
-  drop_address: { 
-    type: String, 
-    default: '' 
-  },
-
-  // Driver-specific
-  vehicle_number: { 
-    type: String, 
-    default: '' 
-  },
-  vehicle_type: { 
-    type: String, 
-    enum: ['van', 'bus', 'other'], 
-    default: 'van' 
-  },
-  license_number: { 
-    type: String, 
-    default: '' 
-  },
-  vehicle_seats: { 
-    type: Number, 
-    default: 0 
   },
 
   // Verification & password reset
@@ -92,6 +70,26 @@ const userSchema = new mongoose.Schema({
     default: [] 
   }
 }, { timestamps: true })
+
+userSchema.pre('findOneAndDelete', async function (next) {
+  try{
+    const user = await this.model.findOne(this.getFilter());
+
+    if(!user) return next();
+
+    if(user.role === 'driver'){
+      await DriverProfile.deleteOne({user_id: user._id});
+    }
+
+    if(user.role === 'parent'){
+      await parentProfile.deleteOne({user_id: user._id});
+    }
+    next();
+  }
+  catch(error){
+    next(error);
+  }
+})
 
 const userModel = mongoose.models.user || mongoose.model('user', userSchema);
 
