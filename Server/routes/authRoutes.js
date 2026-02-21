@@ -1,10 +1,9 @@
 import express from 'express';
-import { signup, login, verifyEmail, logout, sendResetOtp, resetPassword, googleLogin, sendVerifyOtp } from '../controllers/authController.js';
-import userAuth from '../middlewares/AuthMiddleware.js';
+import { register, login, verifyEmail, logout, sendResetOtp, resetPassword, googleLogin, sendVerifyOtp } from '../controllers/authController.js';
 
 const authRouter = express.Router();
 
-authRouter.post('/signup', signup);
+authRouter.post('/register', register);
 authRouter.post('/send-verify-otp', sendVerifyOtp);
 authRouter.post('/verify-email', verifyEmail);
 authRouter.post('/login', login);
