@@ -1,20 +1,29 @@
 import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema({
-  parent: {
+  parent_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: true
+    required: true,
+    index: true
   },
-  driver: {
+  driver_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: true
+    required: true,
+    index: true
   },
-  route: {
+  route_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'route',
-    required: true
+    required: true,
+    index: true
+  },
+  trip_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'trip',
+    required: true,
+    index: true
   },
   vehicle: {
     type: mongoose.Schema.Types.ObjectId,
@@ -24,6 +33,11 @@ const bookingSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['pending', 'accepted', 'rejected', 'completed'],
+    default: 'pending'
+  },
+  trip_status:{
+    type: String,
+    enum: ['pending', 'picked', 'dropped'],
     default: 'pending'
   },
   child_name: {
@@ -39,6 +53,11 @@ const bookingSchema = new mongoose.Schema({
     required: true
   }
 }, { timestamps: true })
+
+bookingSchema.index(
+  { parent_id: 1, trip_id: 1 },
+  { unique: true, partialFilterExpression : {status: {$ne: 'rejected'}} }
+);
 
 const bookingModel = mongoose.models.booking || mongoose.model('booking', bookingSchema);
 
