@@ -20,6 +20,9 @@ const routeSchema = new mongoose.Schema({
   }
 }, { timestamps: true })
 
+routeSchema.index({ driver: 1 });
+routeSchema.index({ start_location: 1, end_location: 1 });
+
 const routeModel = mongoose.models.route || mongoose.model('route', routeSchema);
 
 export default routeModel;
