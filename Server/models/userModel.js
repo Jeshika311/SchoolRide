@@ -42,6 +42,11 @@ const userSchema = new mongoose.Schema({
     default: 'English' 
   },
 
+  profile_photo: {
+    type: String,
+    default: ''
+  },
+
   // Verification & password reset
   verifyOtp: { 
     type: String, 

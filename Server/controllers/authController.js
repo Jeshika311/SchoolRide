@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
 import { sendResetPasswordEmail, sendVerificationEmail, sendWelcomeEmail } from '../utils/sendEmail.js';
@@ -7,7 +8,7 @@ import DriverProfile from '../models/DriverProfile.js';
 import parentProfile from '../models/parentProfile.js';
 
 export const register = async (req, res) => {
-  let {name, email, password, role, phone_number, preferred_language} = req.body;
+  let {name, email, password, role, phone_number, preferred_language, device_token, fcmToken} = req.body;
 
   if(!name || !email || !password || !role || !phone_number || !preferred_language){
     return res.status(400).json({
@@ -52,6 +53,7 @@ export const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const incomingToken = device_token || fcmToken;
 
     const user = new userModel({
       name,
@@ -59,7 +61,8 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role,
       phone_number,
-      preferred_language
+      preferred_language,
+      fcmTokens: incomingToken ? [incomingToken] : []
     })
     await user.save();
 
@@ -78,7 +81,7 @@ export const register = async (req, res) => {
 
     sendWelcomeEmail(user.email, user.name).catch(console.error);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "User registered successfully",
       token,
@@ -88,7 +91,8 @@ export const register = async (req, res) => {
         email: user.email,
         role: user.role,
         phone_number: user.phone_number,
-        preferred_language: user.preferred_language
+        preferred_language: user.preferred_language,
+        fcmTokens: user.fcmTokens
       }
     })
   }
@@ -204,7 +208,7 @@ export const verifyEmail = async (req,res) => {
 }
 
 export const login = async (req,res) => {
-  let {email, password} = req.body;
+  let {email, password, device_token, fcmToken} = req.body;
 
   if(!email || !password){
     return res.status(400).json({
@@ -233,55 +237,10 @@ export const login = async (req,res) => {
       })
     }
 
-    const token = generateToken(user);
-    setAuthCookie(res, token);
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone_number: user.phone_number,
-        preferred_language: user.preferred_language
-      }
-     })
-  }
-  catch(error){
-    console.log("Login error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message
-    })
-  }
-}
-
-export const googleLogin = async (req,res) => {
-  try {
-    let {name, email} = req.body;
-
-    if(!email){
-      return res.status(400).json({
-        success: false,
-        message: "Email is required for Google login"
-      });
-    }
-
-    email = email.toLowerCase().trim();
-
-    let user = await userModel.findOne({email});
-
-    if(!user){
-      return res.status(400).json({
-        success: false,
-        message: "No account found for this email. Please sign up first."
-      });
-    }
-
-    if(name && user.name !== name){
-      user.name = name;
+    // add incoming FCM/device token
+    const incomingToken = device_token || fcmToken;
+    if(incomingToken && !user.fcmTokens.includes(incomingToken)){
+      user.fcmTokens.push(incomingToken);
       await user.save();
     }
 
@@ -297,7 +256,86 @@ export const googleLogin = async (req,res) => {
         email: user.email,
         role: user.role,
         phone_number: user.phone_number,
-        preferred_language: user.preferred_language
+        preferred_language: user.preferred_language,
+        fcmTokens: user.fcmTokens
+      }
+     })
+  }
+  catch(error){
+    console.log("Login error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
+
+export const googleLogin = async (req,res) => {
+  try {
+    let {name, email, google_id, device_token, fcmToken} = req.body;
+
+    if(!email || !google_id){
+      return res.status(400).json({
+        success: false,
+        message: "Email and Google ID are required for Google login"
+      });
+    }
+
+    email = email.toLowerCase().trim();
+
+    let user = await userModel.findOne({email});
+
+    if(!user){
+      return res.status(400).json({
+        success: false,
+        message: "No account found for this email. Please sign up first."
+      });
+    }
+
+    let updated = false;
+
+    if(!user.google_id || user.google_id !== google_id){
+      user.google_id = google_id;
+      updated = true;
+    }
+
+    if(name && user.name !== name){
+      user.name = name;
+      updated = true;
+    }
+
+    const incomingToken = device_token || fcmToken;
+    if(incomingToken && !user.fcmTokens.includes(incomingToken)){
+      user.fcmTokens.push(incomingToken);
+      updated = true;
+    }
+
+    if(!user.isAccountVerified){
+      user.isAccountVerified = true;
+      updated = true;
+    }
+
+    if(updated){
+      await user.save();
+    }
+
+    const token = generateToken(user);
+
+    setAuthCookie(res, token);
+    
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone_number: user.phone_number,
+        preferred_language: user.preferred_language,
+        fcmTokens: user.fcmTokens,
+        google_id: user.google_id
       }
     })
   }
@@ -312,6 +350,32 @@ export const googleLogin = async (req,res) => {
 
 export const logout = async (req,res) => {
   try{
+
+    const { device_token } = req.body;
+    const { token } = req.cookies;
+
+    if(!token){
+      return res.status(401).json({
+        success:false,
+        message:"Unauthorized"
+      })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await userModel.findById(decoded.id);
+
+    if(!user){
+      return res.status(404).json({
+        success:false,
+        message:"User not found"
+      })
+    }
+
+    if(device_token && user.fcmTokens.includes(device_token)){
+      user.fcmTokens = user.fcmTokens.filter(t => t !== device_token);
+      await user.save();
+    }
+
     res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

@@ -15,6 +15,7 @@ import authRouter from './routes/authRoutes.js';
 import ErrorMiddleware from './middlewares/ErrorMiddleware.js';
 import logger from './utils/logger.js';
 import swaggerSpec from './config/swagger.js';
+import userRouter from './routes/userRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -56,6 +57,7 @@ app.use('/api/auth', authRouter);
 
 // Global Error Handler
 app.use(ErrorMiddleware);
+app.use('/api/user', userRouter);
 
 app.listen(PORT, () => {
   logger.info(`Server safely started on http://localhost:${PORT}`)
