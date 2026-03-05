@@ -47,6 +47,12 @@ const userSchema = new mongoose.Schema({
     default: ''
   },
 
+  google_id: {
+    type: String,
+    default: null,
+    index: true
+  },
+
   // Verification & password reset
   verifyOtp: { 
     type: String, 
