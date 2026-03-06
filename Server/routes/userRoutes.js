@@ -5,5 +5,5 @@ import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 const userRouter = express.Router();
 
 userRouter.post('/currentuser', AuthMiddleware, getProfile);
-
+ 
 export default userRouter;
