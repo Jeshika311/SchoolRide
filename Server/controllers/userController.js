@@ -12,7 +12,7 @@ export const getProfile = async (req, res) => {
         message: "Unauthorized"
       });
     }
-
+  
     const user = await userModel.findById(userId).select("-password");
 
     if(!user) {
