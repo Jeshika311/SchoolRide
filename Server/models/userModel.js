@@ -82,11 +82,11 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true })
 
-userSchema.pre('findOneAndDelete', async function (next) {
+userSchema.pre('findOneAndDelete', async function () {
   try{
     const user = await this.model.findOne(this.getFilter());
 
-    if(!user) return next();
+    if(!user) return;
 
     if(user.role === 'driver'){
       await DriverProfile.deleteOne({user_id: user._id});
@@ -95,10 +95,9 @@ userSchema.pre('findOneAndDelete', async function (next) {
     if(user.role === 'parent'){
       await parentProfile.deleteOne({user_id: user._id});
     }
-    next();
   }
   catch(error){
-    next(error);
+    throw error;
   }
 })
 
