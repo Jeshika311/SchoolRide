@@ -77,7 +77,7 @@ export const getVehicleById = async (req, res) => {
     });
   }
 };
-
+ 
 // Get vehicles by driver ID
 export const getVehiclesByDriver = async (req, res) => {
   try {
