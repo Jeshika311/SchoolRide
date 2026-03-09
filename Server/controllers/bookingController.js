@@ -55,7 +55,7 @@ export const getParentBookings = async (req, res, next) => {
         next(error);
     }
 };
-
+  
 export const getDriverBookings = async (req, res, next) => {
     try {
         const driver_id = req.user.id;
