@@ -14,6 +14,7 @@ import ErrorMiddleware from './middlewares/ErrorMiddleware.js';
 import logger from './utils/logger.js';
 import swaggerSpec from './config/swagger.js';
 import userRouter from './routes/userRoutes.js';
+import bookingRouter from './routes/bookingRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -57,6 +58,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/', (req, res) => res.send("API Working. See /api-docs for documentation."))
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/booking', bookingRouter);
 
 // Global Error Handler
 app.use(ErrorMiddleware);
