@@ -28,6 +28,18 @@ export const createVehicle = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Vehicle with that number already exists"
+      });
+    }
     res.status(500).json({
       success: false,
       message: "Internal server error"
@@ -103,7 +115,11 @@ export const updateVehicle = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    const updatedVehicle = await vehicleModel.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+    const updatedVehicle = await vehicleModel.findByIdAndUpdate(
+      id,
+      updates,
+      { new: true, runValidators: true, context: 'query' } // ensure validator sees update values
+    );
 
     if (!updatedVehicle) {
       return res.status(404).json({
@@ -119,6 +135,18 @@ export const updateVehicle = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Vehicle with that number already exists"
+      });
+    }
     res.status(500).json({
       success: false,
       message: "Internal server error"
