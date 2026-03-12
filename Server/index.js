@@ -15,6 +15,8 @@ import logger from './utils/logger.js';
 import swaggerSpec from './config/swagger.js';
 import userRouter from './routes/userRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
+import vehicleRouter from './routes/vehicleRoutes.js';
+import infoRouter from './routes/infoRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -59,6 +61,10 @@ app.get('/', (req, res) => res.send("API Working. See /api-docs for documentatio
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/booking', bookingRouter);
+app.use('/api/vehicle', vehicleRouter);
+
+// general informational endpoints
+app.use('/api', infoRouter);
 
 // Global Error Handler
 app.use(ErrorMiddleware);
