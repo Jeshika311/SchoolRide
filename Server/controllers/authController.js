@@ -123,7 +123,7 @@ export const sendVerifyOtp = async (req,res) => {
     if(!user){
       return res.status(400).json({
         success: false,
-        message: "Invalid credentials"
+        message: "No account found with this email"
       })
     }
 
@@ -208,19 +208,28 @@ export const verifyEmail = async (req,res) => {
 }
 
 export const login = async (req,res) => {
-  let {email, password, device_token, fcmToken} = req.body;
+  // allow login with either email or phone number
+  let { email, phone_number, password, device_token, fcmToken } = req.body;
 
-  if(!email || !password){
+  if((!email && !phone_number) || !password || !(device_token || fcmToken)){
     return res.status(400).json({
       success: false,
-      message: "All fields are required"
+      message: "Email or phone number, password and device token are required"
     })
   }
 
-  email = email.toLowerCase().trim();
+  // normalize identifier
+  let query;
+  if(email){
+    email = email.toLowerCase().trim();
+    query = { email };
+  } else {
+    // phone number will be used as-is
+    query = { phone_number };
+  }
 
   try{
-    const user = await userModel.findOne({email});
+    const user = await userModel.findOne(query);
 
     if(!user){
       return res.status(400).json({
@@ -350,14 +359,20 @@ export const googleLogin = async (req,res) => {
 
 export const logout = async (req,res) => {
   try{
-
     const { device_token } = req.body;
-    const { token } = req.cookies;
+    // support token in cookie or Authorization header
+    let token = req.cookies?.token;
+    if(!token){
+      const authHeader = req.headers.authorization;
+      if(authHeader && authHeader.startsWith('Bearer ')){
+        token = authHeader.split(' ')[1];
+      }
+    }
 
     if(!token){
       return res.status(401).json({
         success:false,
-        message:"Unauthorized"
+        message:"Unauthorized: Token missing"
       })
     }
 
