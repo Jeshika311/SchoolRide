@@ -279,11 +279,11 @@ export const login = async (req,res) => {
   }
 }
 
-export const googleLogin = async (req,res) => {
+export const googleLogin = async (req, res) => {
   try {
-    let {name, email, google_id, device_token, fcmToken} = req.body;
+    let { name, email, google_id, device_token, fcmToken } = req.body;
 
-    if(!email || !google_id){
+    if (!email || !google_id) {
       return res.status(400).json({
         success: false,
         message: "Email and Google ID are required for Google login"
@@ -292,46 +292,68 @@ export const googleLogin = async (req,res) => {
 
     email = email.toLowerCase().trim();
 
-    let user = await userModel.findOne({email});
+    let user = await userModel.findOne({ email });
 
-    if(!user){
-      return res.status(400).json({
-        success: false,
-        message: "No account found for this email. Please sign up first."
+    const incomingToken = device_token || fcmToken;
+
+    // 🟢 CREATE ACCOUNT IF USER DOES NOT EXIST
+    if (!user) {
+
+      // generate random password
+      const randomPassword = Math.random().toString(36).slice(-10);
+
+      // hash password
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = new userModel({
+        name: name || "Google User",
+        email,
+        password: hashedPassword,
+        google_id,
+        role: "parent",
+        preferred_language: "English",
+        isAccountVerified: true,
+        fcmTokens: incomingToken ? [incomingToken] : []
+      });
+
+      await user.save();
+
+      await parentProfile.create({
+        user_id: user._id
       });
     }
 
+    // 🟢 UPDATE EXISTING USER IF NECESSARY
     let updated = false;
 
-    if(!user.google_id || user.google_id !== google_id){
+    if (!user.google_id || user.google_id !== google_id) {
       user.google_id = google_id;
       updated = true;
     }
 
-    if(name && user.name !== name){
+    if (name && user.name !== name) {
       user.name = name;
       updated = true;
     }
 
-    const incomingToken = device_token || fcmToken;
-    if(incomingToken && !user.fcmTokens.includes(incomingToken)){
+    if (incomingToken && !user.fcmTokens.includes(incomingToken)) {
       user.fcmTokens.push(incomingToken);
       updated = true;
     }
 
-    if(!user.isAccountVerified){
+    if (!user.isAccountVerified) {
       user.isAccountVerified = true;
       updated = true;
     }
 
-    if(updated){
+    if (updated) {
       await user.save();
     }
 
     const token = generateToken(user);
 
     setAuthCookie(res, token);
-    
+
     return res.status(200).json({
       success: true,
       message: "Login successful",
@@ -346,16 +368,17 @@ export const googleLogin = async (req,res) => {
         fcmTokens: user.fcmTokens,
         google_id: user.google_id
       }
-    })
-  }
-  catch(error){
+    });
+
+  } catch (error) {
     console.log("Google Login error:", error);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: error.message
-    })
+    });
   }
-}
+};
 
 export const logout = async (req,res) => {
   try{
@@ -451,64 +474,105 @@ export const sendResetOtp = async (req, res) => {
   }
 }
 
-export const resetPassword = async (req, res) => {
-  let {email, otp, newPassword} = req.body;
+export const verifyResetOtp = async (req, res) => {
+  let { email, otp } = req.body;
 
-  if(!email || !otp || !newPassword){
+  if (!email || !otp) {
     return res.status(400).json({
       success: false,
-      message: "All fields are required"
-    })
+      message: "Email and OTP are required"
+    });
   }
 
   email = email.toLowerCase().trim();
- 
-  try {
-    const user = await userModel.findOne({email});
 
-    if(!user){
+  try {
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
       return res.status(400).json({
         success: false,
         message: "Invalid credentials"
-      })
+      });
     }
-    if(user.resetOtp === '' || user.resetOtp !== otp){
+
+    if (user.resetOtp === '' || user.resetOtp !== otp) {
       return res.status(400).json({
         success: false,
         message: "Invalid OTP"
-      })
+      });
     }
-    if(user.resetOtpExpireAt < Date.now()){
+
+    if (user.resetOtpExpireAt < Date.now()) {
       return res.status(400).json({
         success: false,
         message: "OTP has expired"
-      })
+      });
     }
 
-    if(newPassword.length < 6){
+    return res.json({
+      success: true,
+      message: "OTP verified successfully"
+    });
+
+  } catch (error) {
+    console.log("Verify Reset OTP error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  let { email, newPassword } = req.body;
+
+  if (!email || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Email and new password are required"
+    });
+  }
+
+  email = email.toLowerCase().trim();
+
+  try {
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials"
+      });
+    }
+
+    if (newPassword.length < 6) {
       return res.status(400).json({
         success: false,
         message: "Password must be at least 6 characters"
-      })
+      });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+
     user.password = hashedPassword;
     user.resetOtp = '';
     user.resetOtpExpireAt = 0;
+
     await user.save();
 
     return res.json({
       success: true,
       message: "Password reset successful"
-    })
-  }
+    });
 
-  catch(error){
+  } catch (error) {
     console.log("Reset Password error:", error);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: error.message
-    })
+    });
   }
-}
+};
