@@ -21,8 +21,8 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: false,
     unique: true,
+    sparse: true,
     match: [/^\d{10}$/, 'Please use a valid 10-digit phone number.'],
-    index: true
   },
   password: { 
     type: String, 
