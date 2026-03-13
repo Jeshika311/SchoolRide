@@ -1,6 +1,5 @@
 import vehicleModel from '../models/vehicleModel.js';
 
-// Create a new vehicle
 export const createVehicle = async (req, res) => {
   try {
     const { driver_id, vehicle_number, total_seats, available_seats } = req.body;
@@ -20,6 +19,19 @@ export const createVehicle = async (req, res) => {
     });
 
     await newVehicle.save();
+
+    // when a driver creates a vehicle, update their profile's vehicle_seats
+    try {
+      const DriverProfile = (await import('../models/DriverProfile.js')).default;
+      await DriverProfile.findOneAndUpdate(
+        { user_id: driver_id },
+        { vehicle_seats: total_seats },
+        { upsert: true }
+      );
+    } catch (err) {
+      // profile update failure should not block vehicle creation
+      console.error('Failed to sync driver profile seats:', err);
+    }
 
     res.status(201).json({
       success: true,
@@ -47,7 +59,6 @@ export const createVehicle = async (req, res) => {
   }
 };
 
-// Get all vehicles
 export const getVehicles = async (req, res) => {
   try {
     const vehicles = await vehicleModel.find().populate('driver_id', 'name email');
@@ -64,7 +75,6 @@ export const getVehicles = async (req, res) => {
   }
 };
 
-// Get vehicle by ID
 export const getVehicleById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -90,7 +100,6 @@ export const getVehicleById = async (req, res) => {
   }
 };
  
-// Get vehicles by driver ID
 export const getVehiclesByDriver = async (req, res) => {
   try {
     const { driver_id } = req.params;
@@ -109,7 +118,6 @@ export const getVehiclesByDriver = async (req, res) => {
   }
 };
 
-// Update vehicle
 export const updateVehicle = async (req, res) => {
   try {
     const { id } = req.params;
@@ -120,6 +128,24 @@ export const updateVehicle = async (req, res) => {
       updates,
       { new: true, runValidators: true, context: 'query' } // ensure validator sees update values
     );
+
+    // if total_seats was changed, sync it to the driver's profile as well
+    if (updates.total_seats !== undefined) {
+      try {
+        const DriverProfile = (await import('../models/DriverProfile.js')).default;
+        // determine driver_id either from updatedVehicle or payload
+        const driverId = updatedVehicle.driver_id || updates.driver_id;
+        if (driverId) {
+          await DriverProfile.findOneAndUpdate(
+            { user_id: driverId },
+            { vehicle_seats: updates.total_seats },
+            { upsert: true }
+          );
+        }
+      } catch (err) {
+        console.error('Failed to sync driver profile seats after update:', err);
+      }
+    }
 
     if (!updatedVehicle) {
       return res.status(404).json({
@@ -154,7 +180,6 @@ export const updateVehicle = async (req, res) => {
   }
 };
 
-// Delete vehicle
 export const deleteVehicle = async (req, res) => {
   try {
     const { id } = req.params;
