@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   },
   phone_number: { 
     type: String, 
-    required: true,
+    required: false,
     unique: true,
     match: [/^\d{10}$/, 'Please use a valid 10-digit phone number.'],
     index: true
@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
     type: String, 
     enum: ['parent', 'driver', 'admin'],
     required: true,
+    default: 'parent',
     index: true
   },
 
