@@ -62,7 +62,7 @@ export const register = async (req, res) => {
       role,
       phone_number,
       preferred_language,
-      fcmTokens: incomingToken ? [incomingToken] : []
+      device_token: incomingToken || null
     })
     await user.save();
 
@@ -92,7 +92,7 @@ export const register = async (req, res) => {
         role: user.role,
         phone_number: user.phone_number,
         preferred_language: user.preferred_language,
-        fcmTokens: user.fcmTokens
+        device_token: user.device_token
       }
     })
   }
@@ -248,8 +248,9 @@ export const login = async (req,res) => {
 
     // add incoming FCM/device token
     const incomingToken = device_token || fcmToken;
-    if(incomingToken && !user.fcmTokens.includes(incomingToken)){
-      user.fcmTokens.push(incomingToken);
+
+    if(incomingToken){
+      user.device_token = incomingToken;
       await user.save();
     }
 
@@ -266,7 +267,7 @@ export const login = async (req,res) => {
         role: user.role,
         phone_number: user.phone_number,
         preferred_language: user.preferred_language,
-        fcmTokens: user.fcmTokens
+        device_token: user.device_token
       }
      })
   }
@@ -313,7 +314,7 @@ export const googleLogin = async (req, res) => {
         role: "parent",
         preferred_language: "English",
         isAccountVerified: true,
-        fcmTokens: incomingToken ? [incomingToken] : []
+        device_token: incomingToken || null
       });
 
       await user.save();
@@ -336,8 +337,8 @@ export const googleLogin = async (req, res) => {
       updated = true;
     }
 
-    if (incomingToken && !user.fcmTokens.includes(incomingToken)) {
-      user.fcmTokens.push(incomingToken);
+    if (incomingToken && user.device_token !== incomingToken) {
+      user.device_token = incomingToken;
       updated = true;
     }
 
@@ -409,8 +410,8 @@ export const logout = async (req,res) => {
       })
     }
 
-    if(device_token && user.fcmTokens.includes(device_token)){
-      user.fcmTokens = user.fcmTokens.filter(t => t !== device_token);
+    if(device_token && user.device_token === device_token){
+      user.device_token = null;
       await user.save();
     }
 

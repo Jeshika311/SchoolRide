@@ -77,9 +77,9 @@ const userSchema = new mongoose.Schema({
   },
 
   // FCM tokens for notifications
-  fcmTokens: { 
-    type: [String], 
-    default: [] 
+  device_token: { 
+    type: String, 
+    default: null
   }
 }, { timestamps: true })
 
