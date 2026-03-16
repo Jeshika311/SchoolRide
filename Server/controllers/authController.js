@@ -381,58 +381,49 @@ export const googleLogin = async (req, res) => {
   }
 };
 
-export const logout = async (req,res) => {
-  try{
-    const { device_token } = req.body;
-    // support token in cookie or Authorization header
-    let token = req.cookies?.token;
-    if(!token){
-      const authHeader = req.headers.authorization;
-      if(authHeader && authHeader.startsWith('Bearer ')){
-        token = authHeader.split(' ')[1];
-      }
+export const logout = async (req, res, next) => {
+  try {
+
+    let token;
+
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
     }
 
-    if(!token){
+    if (!token && req.cookies?.token) {
+      token = req.cookies.token;
+    }
+
+    if (!token) {
       return res.status(401).json({
-        success:false,
-        message:"Unauthorized: Token missing"
-      })
+        success: false,
+        message: "Unauthorized: No token provided"
+      });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await userModel.findById(decoded.id);
+    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
 
-    if(!user){
-      return res.status(404).json({
-        success:false,
-        message:"User not found"
-      })
-    }
+    req.user = {
+      id: tokenDecode.id,
+      role: tokenDecode.role
+    };
 
-    if(device_token && user.device_token === device_token){
-      user.device_token = null;
-      await user.save();
-    }
+    next();
 
-    res.clearCookie('token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-    })
-    return res.status(200).json({
-      success: true,
-      message: "Logout successful"
-    })
-  }
-  catch(error){
-    console.log("Logout error:", error);
-    res.status(500).json({
+  } catch (error) {
+    console.log("JWT error:", error.message);
+
+    return res.status(401).json({
       success: false,
-      message: error.message
-    })
+      message:
+        error.message === "jwt expired"
+          ? "Unauthorized: Token expired"
+          : "Unauthorized: Invalid token"
+    });
   }
-}
+};
 
 export const sendResetOtp = async (req, res) => {
   let {email} = req.body;
