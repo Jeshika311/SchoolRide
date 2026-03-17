@@ -1,18 +1,3 @@
 {"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-03-03T19:02:24.992Z"}
 {"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-03-03T19:03:19.341Z"}
 {"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-03-03T19:03:55.558Z"}
-{"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-03-17T08:31:14.216Z"}
-{"level":"info","message":"GET /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:32:35.604Z"}
-{"level":"info","message":"GET /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:33:24.807Z"}
-{"level":"info","message":"GET /api/trips","service":"schoolride-api","timestamp":"2026-03-17T08:33:34.852Z"}
-{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:33:44.900Z"}
-{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:33:44.907Z"}
-{"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-03-17T08:34:32.315Z"}
-{"level":"info","message":"GET /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:34.801Z"}
-{"level":"info","message":"GET /api/trips","service":"schoolride-api","timestamp":"2026-03-17T08:41:34.912Z"}
-{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:35.013Z"}
-{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:35.020Z"}
-{"level":"info","message":"GET /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:47.878Z"}
-{"level":"info","message":"GET /api/trips","service":"schoolride-api","timestamp":"2026-03-17T08:41:47.957Z"}
-{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:48.025Z"}
-{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:48.029Z"}

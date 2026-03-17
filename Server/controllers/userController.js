@@ -59,13 +59,25 @@ export const updateProfile = async (req,res) => {
       })
     }
 
-    const {name, preferred_language, profile_photo} = req.body;
+    const {name, preferred_language, profile_photo, phone_number} = req.body;
 
     const updateData = {};
 
     if(name) updateData.name = name;
     if(preferred_language) updateData.preferred_language = preferred_language;
     if(profile_photo) updateData.profile_photo = profile_photo;
+    if(phone_number !== undefined){
+      const normalizedPhone = String(phone_number).trim();
+
+      if(!/^\d{10}$/.test(normalizedPhone)){
+        return res.status(400).json({
+          success: false,
+          message: "Phone number must be a valid 10-digit number"
+        });
+      }
+
+      updateData.phone_number = normalizedPhone;
+    }
 
     if(Object.keys(updateData).length === 0){
       return res.status(400).json({
@@ -90,6 +102,13 @@ export const updateProfile = async (req,res) => {
     });
   }
   catch(error) {
+    if(error?.code === 11000 && error?.keyPattern?.phone_number){
+      return res.status(400).json({
+        success: false,
+        message: "Phone number already in use"
+      });
+    }
+
     console.log("Update Profile Error: ", error);
     res.status(500).json({
       success: false,
@@ -98,7 +117,6 @@ export const updateProfile = async (req,res) => {
   }
 }
 
-// -------- additional user endpoints ----------------
 export const getParentProfile = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -219,46 +237,45 @@ export const changeLanguage = async (req, res) => {
   }
 };
 
-export const deleteAccount = async (req, res) => {
-  try {
-    const userId = req.user?.id;
+export const deleteAccount = async (req,res)=>{
+  try{
 
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized"
-      });
+    let { email } = req.body;
+
+    if(!email){
+      return res.status(400).json({
+        success:false,
+        message:"Email is required"
+      })
     }
 
-    const user = await userModel.findById(userId);
+    email = email.toLowerCase().trim();
 
-    if (!user) {
+    const user = await userModel.findOne({ email });
+
+    if(!user){
       return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
+        success:false,
+        message:"User not found"
+      })
     }
 
-
-    await notificationModel.deleteMany({ user_id: userId });
-    await SupportTicket.deleteMany({ user_id: userId });
-
-    await userModel.findByIdAndDelete(userId);
+    await userModel.findOneAndDelete({ email });
 
     return res.json({
-      success: true,
-      message: "Account deleted successfully"
-    });
+      success:true,
+      message:"Account deleted successfully"
+    })
 
-  } catch (error) {
-    console.error("Delete Account Error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
   }
-};
+  catch(error){
+    console.log("Delete account error:",error)
+    res.status(500).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
 
 export const createSupportTicket = async (req, res) => {
   try {
@@ -293,4 +310,3 @@ export const getNotifications = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-

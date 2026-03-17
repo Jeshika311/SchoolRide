@@ -19,6 +19,7 @@ import vehicleRouter from './routes/vehicleRoutes.js';
 import infoRouter from './routes/infoRoutes.js';
 import routeRouter from './routes/routeRoutes.js';
 import tripRouter from './routes/tripRoutes.js';
+import NotificationRouter from './routes/notificationRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -66,6 +67,7 @@ app.use('/api/booking', bookingRouter);
 app.use('/api/vehicle', vehicleRouter);
 app.use('/api/routes', routeRouter);
 app.use('/api/trips', tripRouter);
+app.use('/api/notification', NotificationRouter);
 
 // general informational endpoints
 app.use('/api', infoRouter);
