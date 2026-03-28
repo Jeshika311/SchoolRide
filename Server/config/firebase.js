@@ -1,12 +1,40 @@
-// import admin from "firebase-admin";
-// import fs from "fs";
+import admin from 'firebase-admin';
 
-// const serviceAccount = JSON.parse(
-//   fs.readFileSync(new URL("../firebase-service-account.json", import.meta.url))
-// );
+let isInitialized = false;
 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
+const initializeFirebase = () => {
+	if (isInitialized || admin.apps.length > 0) {
+		isInitialized = true;
+		return true;
+	}
 
-// export default admin;
+	try {
+		// Prefer env-configured service account values for deployment portability.
+		if (
+			process.env.FIREBASE_PROJECT_ID &&
+			process.env.FIREBASE_CLIENT_EMAIL &&
+			process.env.FIREBASE_PRIVATE_KEY
+		) {
+			const privateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n');
+
+			admin.initializeApp({
+				credential: admin.credential.cert({
+					projectId: process.env.FIREBASE_PROJECT_ID,
+					clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+					privateKey
+				})
+			});
+
+			isInitialized = true;
+			return true;
+		}
+
+		return false;
+	} catch (_error) {
+		return false;
+	}
+};
+
+export const isFirebaseReady = () => initializeFirebase();
+
+export default admin;

@@ -20,6 +20,7 @@ import infoRouter from './routes/infoRoutes.js';
 import routeRouter from './routes/routeRoutes.js';
 import tripRouter from './routes/tripRoutes.js';
 import NotificationRouter from './routes/notificationRoutes.js';
+import locationRouter from './routes/locationRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -68,6 +69,7 @@ app.use('/api/vehicle', vehicleRouter);
 app.use('/api/routes', routeRouter);
 app.use('/api/trips', tripRouter);
 app.use('/api/notification', NotificationRouter);
+app.use('/api/location', locationRouter);
 
 // general informational endpoints
 app.use('/api', infoRouter);
