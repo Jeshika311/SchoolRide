@@ -1,0 +1,274 @@
+/* Shared styles for auth pages */
+.auth-page {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  padding: 18px;
+  box-sizing: border-box;
+  color: #0f172a;
+}
+
+.auth-shell {
+  width: min(100%, 420px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 50px;
+}
+
+.auth-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.back-btn {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.auth-title {
+  text-align: center;
+  font-size: clamp(24px, 5vw, 34px);
+  font-weight: 700;
+  margin: 6px 0;
+}
+
+.pill-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e6eefb;
+  padding: 6px;
+  border-radius: 999px;
+  width: fit-content;
+  margin: 8px auto;
+}
+
+.pill-toggle button {
+  border: none;
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.pill-toggle .active {
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(14, 165, 233, 0.12);
+  color: #0369a1;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field-label {
+  font-size: 13px;
+  color: #374151;
+  text-align: start;
+}
+
+.text-input,
+.password-input {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: none;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 1);
+  font-size: 14px;
+  text-align: start;
+}
+
+.big-btn {
+  background: #0ea5e9;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-row {
+  text-align: center;
+  font-size: 13px;
+}
+
+.small-muted {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.otp-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.otp-input {
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  border-radius: 8px;
+  border: none;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 1);
+  font-size: 20px;
+}
+
+.note-error {
+  color: #ef4444;
+  font-size: 13px;
+}
+
+/* Tablet Screens (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .auth-page {
+    padding: 24px;
+  }
+
+  .auth-shell {
+    gap: 22px;
+    padding-top: 60px;
+  }
+
+  .auth-title {
+    font-size: clamp(26px, 5vw, 32px);
+    margin: 8px 0;
+  }
+
+  .pill-toggle {
+    margin: 12px auto;
+    gap: 10px;
+    padding: 8px;
+  }
+
+  .pill-toggle button {
+    padding: 10px 20px;
+  }
+
+  .auth-form {
+    gap: 20px;
+  }
+
+  .field-label {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .text-input, .password-input {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+
+  .big-btn {
+    padding: 14px 24px;
+    font-size: 15px;
+    min-height: 48px;
+  }
+
+  .link-row {
+    font-size: 14px;
+    gap: 8px;
+  }
+
+  .small-muted {
+    font-size: 13px;
+  }
+
+  .otp-input {
+    width: 56px;
+    height: 56px;
+    font-size: 22px;
+  }
+}
+
+/* Phone Screens (max-width: 480px) */
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 16px;
+  }
+
+  .auth-shell {
+    gap: 18px;
+    padding-top: 40px;
+    width: 100%;
+  }
+
+  .auth-title {
+    font-size: clamp(22px, 5vw, 28px);
+    margin: 4px 0 8px 0;
+  }
+
+  .pill-toggle {
+    margin: 8px auto;
+    gap: 6px;
+    padding: 5px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pill-toggle button {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .auth-form {
+    gap: 16px;
+  }
+
+  .field-label {
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+
+  .text-input, .password-input {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+
+  .big-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-height: 44px;
+    border-radius: 12px;
+    margin-top: 4px;
+  }
+
+  .link-row {
+    font-size: 12px;
+    gap: 4px;
+    flex-direction: column;
+  }
+
+  .small-muted {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .otp-row {
+    gap: 6px;
+  }
+
+  .otp-input {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .auth-shell { padding: 0 8px }
+}
