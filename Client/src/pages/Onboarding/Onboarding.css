@@ -170,7 +170,9 @@
   width:100%;
   height:100%;
   object-fit:cover;
+  object-position:center;
   display:block;
+  border-radius:16px 16px 0 0;
 }
 
 .account-body-row{
@@ -179,6 +181,9 @@
   align-items:center;
   gap:clamp(12px, 1.5vw, 18px);
   padding:clamp(14px, 1.8vw, 22px) clamp(14px, 2vw, 24px) clamp(14px, 1.8vw, 20px);
+  position:static;
+  background:transparent;
+  backdrop-filter:none;
 }
 
 .account-icon{
@@ -249,7 +254,11 @@
   }
 
   .account-hero{
-    aspect-ratio: 16 / 6.3;
+    aspect-ratio: 16 / 6.5;
+  }
+  .account-hero .img{
+    object-fit:cover;
+    object-position:left center;
   }
 }
 
@@ -264,6 +273,21 @@
 
   .account-body-row{
     padding:clamp(16px, 1.5vw, 24px) clamp(18px, 1.8vw, 26px) clamp(16px, 1.5vw, 24px);
+  }
+
+  /* On very wide screens focus the visible area to the left so characters appear */
+  .account-hero img{
+    /* show full image on large screens */
+    object-fit:contain;
+    object-position:center;
+    background:#f8fbff;
+    width:auto;
+    height:100%;
+  }
+
+  /* increase hero height on large screens so the panorama has room */
+  .account-hero{
+    aspect-ratio: 16 / 5;
   }
 }
 

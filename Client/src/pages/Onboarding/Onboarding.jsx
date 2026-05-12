@@ -54,7 +54,7 @@ export default function Onboarding({ onFinish }) {
     else setIndex(slides.length); // move to choose-account screen
   };
 
-  const skip = () => onFinish && onFinish();
+  const skip = () => setIndex(slides.length);
 
   if (index === slides.length) {
     return (
