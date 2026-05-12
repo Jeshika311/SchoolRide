@@ -572,10 +572,20 @@
   .nav-label {
     font-size: 10px;
   }
+
+  .bottom-nav {
+    padding: 60px 0 64px;
+    gap: 0;
+  }
 }
 
 /* Medium Phones (481px - 600px) */
 @media (min-width: 481px) and (max-width: 600px) {
+  .bottom-nav {
+    padding: 48px 0 52px;
+    gap: 0;
+  }
+
   .booking-header {
     padding: 16px 14px;
   }
