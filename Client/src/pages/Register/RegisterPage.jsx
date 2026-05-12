@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchApi } from '../../api';
 import './RegisterPage.css';
 
@@ -7,6 +7,8 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -39,7 +41,7 @@ export default function RegisterPage() {
       email: formData.email.trim(),
       phone_number: formData.phone_number.trim(),
       password: formData.password,
-      role: 'parent',
+      role: localStorage.getItem('userRole') || 'parent',
       preferred_language: 'English',
     };
 
@@ -52,6 +54,7 @@ export default function RegisterPage() {
 
     if (status === 201 || status === 200) {
       setMessage({ type: 'success', text: data.message || 'Account created successfully.' });
+      localStorage.setItem('registeredUser', JSON.stringify(data.user || payload));
       setFormData({
         name: '',
         email: '',
@@ -60,6 +63,7 @@ export default function RegisterPage() {
         acceptTerms: false,
       });
       setShowPassword(false);
+      navigate('/profile-completion', { replace: true });
       return;
     }
 
@@ -75,70 +79,70 @@ export default function RegisterPage() {
 
         <form className="register-form" onSubmit={handleSubmit}>
           <div className="field-group">
-            <label className="field-label" htmlFor="name">Full Name</label>
-            <input
-              id="name"
-              className="text-input"
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder='Enter name'
-              required
-            />
-          </div>
-
-          <div className="field-group">
-            <label className="field-label" htmlFor="email">Email Address</label>
-            <input
-              id="email"
-              className="text-input"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder='Enter email'
-              required
-            />
-          </div>
-
-          <div className="field-group">
-            <label className="field-label" htmlFor="phone_number">Phone Number</label>
-             <input
-               id="phone_number"
-               className="text-input"
-               type="tel"
-               name="phone_number"
-               placeholder="Phone Number"
-               value={formData.phone_number}
-               onChange={handleChange}
-               required
-             />
-          </div>
-
-          <div className="field-group">
-            <label className="field-label" htmlFor="password">Password</label>
-            <div className="password-row">
+              <label className="field-label" htmlFor="name">Full Name</label>
               <input
-                id="password"
-                className="password-input"
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                value={formData.password}
+                id="name"
+                className="text-input"
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                placeholder='Enter password'
+                placeholder='Enter your name'
                 required
               />
-              <button
-                type="button"
-                className="eye-btn"
-                onClick={() => setShowPassword((previous) => !previous)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? '◠' : '◔'}
-              </button>
             </div>
-          </div>
+
+            <div className="field-group">
+              <label className="field-label" htmlFor="email">Email Address</label>
+              <input
+                id="email"
+                className="text-input"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder='Enter your email'
+                required
+              />
+            </div>
+
+            <div className="field-group">
+              <label className="field-label" htmlFor="phone_number">Phone Number</label>
+              <input
+                id="phone_number"
+                className="text-input"
+                type="tel"
+                name="phone_number"
+                placeholder="10-digit phone number"
+                value={formData.phone_number}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="field-group">
+              <label className="field-label" htmlFor="password">Password</label>
+              <div className="password-row">
+                <input
+                  id="password"
+                  className="password-input"
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder='Enter a secure password'
+                  required
+                />
+                <button
+                  type="button"
+                  className="eye-btn"
+                  onClick={() => setShowPassword((previous) => !previous)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? '◠' : '◔'}
+                </button>
+              </div>
+            </div>
 
           <label className="checkbox-row">
             <input
@@ -149,7 +153,7 @@ export default function RegisterPage() {
               required
             />
             <span>
-              I Have Read and Agree to <a href="#">User Agreement</a> <a href="#">Privacy Policy</a>
+              I Have Read and Agree to <Link to="/terms">User Agreement</Link> <Link to="/privacy">Privacy Policy</Link>
             </span>
           </label>
 
