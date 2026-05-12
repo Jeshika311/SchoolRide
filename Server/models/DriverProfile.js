@@ -23,6 +23,10 @@ const driverProfileSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  years_experience: {
+    type: Number,
+    default: 0
+  },
   vehicle_seats:{
     type: Number,
     default: 0

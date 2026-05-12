@@ -9,6 +9,18 @@ const parentProfileSchema = new mongoose.Schema({
     unique: true,
     index: true
   },
+  child_name: {
+    type: String,
+    default: ''
+  },
+  school_name: {
+    type: String,
+    default: ''
+  },
+  grade_class: {
+    type: String,
+    default: ''
+  },
   pickup_address: {
     type: String,
     default: ''

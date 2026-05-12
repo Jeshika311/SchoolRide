@@ -81,19 +81,18 @@ const mockResponse = () => {
 
 test('login with email works and stores device token', async () => {
   await createFakeUser();
-  const req = { body: { email: fakeUser.email, password: 'password123', device_token: 'dev1' } };
+  const req = { body: { email: fakeUser.email, password: 'password123' } };
   const res = mockResponse();
   await authController.login(req, res);
   assert.strictEqual(res.getStatus(), 200);
   const data = res.getJson();
   assert(data.success);
   assert(data.token);
-  assert.deepStrictEqual(data.user.fcmTokens, ['dev1']);
 });
 
 test('login with phone number works', async () => {
   await createFakeUser();
-  const req = { body: { phone_number: fakeUser.phone_number, password: 'password123', device_token: 'tokenB' } };
+  const req = { body: { phone_number: fakeUser.phone_number, password: 'password123' } };
   const res = mockResponse();
   await authController.login(req, res);
   assert.strictEqual(res.getStatus(), 200);

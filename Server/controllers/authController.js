@@ -211,10 +211,10 @@ export const login = async (req,res) => {
   // allow login with either email or phone number
   let { email, phone_number, password, device_token, fcmToken } = req.body;
 
-  if((!email && !phone_number) || !password || !(device_token || fcmToken)){
+  if((!email && !phone_number) || !password){
     return res.status(400).json({
       success: false,
-      message: "Email or phone number, password and device token are required"
+      message: "Email or phone number and password are required"
     })
   }
 
