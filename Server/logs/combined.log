@@ -16,3 +16,8 @@
 {"level":"info","message":"GET /api/trips","service":"schoolride-api","timestamp":"2026-03-17T08:41:47.957Z"}
 {"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:48.025Z"}
 {"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T08:41:48.029Z"}
+{"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-03-17T09:21:48.995Z"}
+{"level":"info","message":"GET /api/routes","service":"schoolride-api","timestamp":"2026-03-17T09:22:39.422Z"}
+{"level":"info","message":"GET /api/trips","service":"schoolride-api","timestamp":"2026-03-17T09:22:39.517Z"}
+{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T09:22:39.601Z"}
+{"level":"info","message":"POST /api/routes","service":"schoolride-api","timestamp":"2026-03-17T09:22:39.606Z"}
