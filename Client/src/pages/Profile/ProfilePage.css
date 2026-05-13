@@ -60,6 +60,7 @@
 .menu-item .menu-label { font-weight: 600 }
 
 .menu-item.danger { background: #fff6f6; color: #b91c1c }
+.menu-item.logout { background: #f8fbff; color: #000 }
 
 /* Settings panel styles */
 .settings-panel {
