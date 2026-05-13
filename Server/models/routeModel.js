@@ -17,6 +17,22 @@ const routeSchema = new mongoose.Schema({
   stops: {
     type: [String],
     default: []
+  },
+  start_coords: {
+    lat: { type: Number },
+    lon: { type: Number }
+  },
+  end_coords: {
+    lat: { type: Number },
+    lon: { type: Number }
+  },
+  distance_km: {
+    type: Number,
+    default: 0
+  },
+  duration_minutes: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true })
 
