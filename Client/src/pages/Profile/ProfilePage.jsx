@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchApi } from '../../api';
+import { FiLogOut } from 'react-icons/fi';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
-  const [showSettings, setShowSettings] = React.useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   const handleNavigate = (path) => {
     // Placeholder: navigate to real routes if exist
@@ -16,6 +17,22 @@ export default function ProfilePage() {
 
   const openSettings = () => setShowSettings(true);
   const closeSettings = () => setShowSettings(false);
+
+  const handleLogout = async () => {
+    const deviceToken = authUser.device_token || authUser.fcmToken || authUser.deviceToken;
+
+    await fetchApi('/auth/logout', {
+      method: 'POST',
+      body: JSON.stringify(deviceToken ? { device_token: deviceToken } : {}),
+    });
+
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('profileData');
+    localStorage.removeItem('currentBooking');
+
+    navigate('/login', { replace: true });
+  };
 
   const handleDeleteAccount = async () => {
     const isConfirmed = window.confirm('Are you sure you want to delete your account? This cannot be undone.');
@@ -81,6 +98,11 @@ export default function ProfilePage() {
               <span className="menu-icon">🗑️</span>
               <span className="menu-label">Delete Account</span>
             </button>
+
+            <button className="menu-item logout" onClick={handleLogout}>
+              <span className="menu-icon"><FiLogOut /></span>
+              <span className="menu-label">Logout</span>
+            </button>
           </>
         ) : (
           <div className="settings-panel">
@@ -130,6 +152,11 @@ export default function ProfilePage() {
             <button className="menu-item danger" onClick={handleDeleteAccount}>
               <span className="menu-icon">🗑️</span>
               <span className="menu-label">Delete Account</span>
+            </button>
+
+            <button className="menu-item logout" onClick={handleLogout}>
+              <span className="menu-icon"><FiLogOut /></span>
+              <span className="menu-label">Logout</span>
             </button>
           </div>
         )}
