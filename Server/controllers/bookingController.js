@@ -1,4 +1,5 @@
 import bookingModel from '../models/bookingModel.js';
+import vehicleModel from '../models/vehicleModel.js';
 
 export const createBooking = async (req, res, next) => {
     try {
@@ -7,6 +8,18 @@ export const createBooking = async (req, res, next) => {
 
         if (!driver_id || !route_id || !trip_id || !vehicle || !child_name || !pickup_point || !drop_point) {
             return res.status(400).json({ success: false, message: 'All required fields must be provided' });
+        }
+
+        // decrement available_seats atomically to protect against two users
+        // trying to book the last seat at the same time
+        const updatedVehicle = await vehicleModel.findOneAndUpdate(
+            { _id: vehicle, available_seats: { $gt: 0 } },
+            { $inc: { available_seats: -1 } },
+            { new: true }
+        );
+
+        if (!updatedVehicle) {
+            return res.status(400).json({ success: false, message: 'No seats available' });
         }
 
         const newBooking = new bookingModel({
@@ -22,7 +35,17 @@ export const createBooking = async (req, res, next) => {
             trip_status: 'pending'
         });
 
-        await newBooking.save();
+        try {
+            await newBooking.save();
+        } catch (saveError) {
+            // if uniqueness error happens, roll back the seat decrement
+            if (saveError.code === 11000) {
+                await vehicleModel.findByIdAndUpdate(vehicle, { $inc: { available_seats: 1 } });
+                return res.status(400).json({ success: false, message: 'A booking for this parent and trip already exists' });
+            }
+            // for any other error rethrow so outer catch handles it
+            throw saveError;
+        }
 
         res.status(201).json({
             success: true,
@@ -30,9 +53,6 @@ export const createBooking = async (req, res, next) => {
             data: newBooking
         });
     } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).json({ success: false, message: 'A booking for this parent and trip already exists' });
-        }
         next(error);
     }
 };
@@ -185,6 +205,14 @@ export const deleteBooking = async (req, res, next) => {
         }
 
         await bookingModel.findByIdAndDelete(id);
+
+        // restore seat to vehicle when a pending reservation is removed
+        try {
+            await vehicleModel.findByIdAndUpdate(booking.vehicle, { $inc: { available_seats: 1 } });
+        } catch (_err) {
+            // log but don't fail user delete; leave vehicle count to be reconciled separately
+            console.warn('failed to restore vehicle seat after booking deletion');
+        }
 
         res.status(200).json({
             success: true,

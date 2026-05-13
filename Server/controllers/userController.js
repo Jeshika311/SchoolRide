@@ -59,13 +59,45 @@ export const updateProfile = async (req,res) => {
       })
     }
 
-    const {name, preferred_language, profile_photo} = req.body;
+    const {name, email, preferred_language, profile_photo, phone_number} = req.body;
 
     const updateData = {};
 
     if(name) updateData.name = name;
+    if(email){
+      const normalizedEmail = String(email).toLowerCase().trim();
+
+      if(!/\S+@\S+\.\S+/.test(normalizedEmail)){
+        return res.status(400).json({
+          success: false,
+          message: "Please use a valid email address"
+        });
+      }
+
+      const existingUser = await userModel.findOne({ email: normalizedEmail, _id: { $ne: userId } });
+      if(existingUser){
+        return res.status(400).json({
+          success: false,
+          message: "Email already in use"
+        });
+      }
+
+      updateData.email = normalizedEmail;
+    }
     if(preferred_language) updateData.preferred_language = preferred_language;
     if(profile_photo) updateData.profile_photo = profile_photo;
+    if(phone_number !== undefined){
+      const normalizedPhone = String(phone_number).trim();
+
+      if(!/^\d{10}$/.test(normalizedPhone)){
+        return res.status(400).json({
+          success: false,
+          message: "Phone number must be a valid 10-digit number"
+        });
+      }
+
+      updateData.phone_number = normalizedPhone;
+    }
 
     if(Object.keys(updateData).length === 0){
       return res.status(400).json({
@@ -90,6 +122,13 @@ export const updateProfile = async (req,res) => {
     });
   }
   catch(error) {
+    if(error?.code === 11000 && error?.keyPattern?.phone_number){
+      return res.status(400).json({
+        success: false,
+        message: "Phone number already in use"
+      });
+    }
+
     console.log("Update Profile Error: ", error);
     res.status(500).json({
       success: false,
@@ -98,7 +137,6 @@ export const updateProfile = async (req,res) => {
   }
 }
 
-// -------- additional user endpoints ----------------
 export const getParentProfile = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -127,10 +165,19 @@ export const updateParentProfile = async (req, res) => {
     if (!user || user.role !== 'parent') {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
-    const { pickup_address, drop_address } = req.body;
+    const {
+      child_name,
+      school_name,
+      grade_class,
+      pickup_address,
+      drop_address
+    } = req.body;
     const updateData = {};
-    if (pickup_address) updateData.pickup_address = pickup_address;
-    if (drop_address) updateData.drop_address = drop_address;
+    if (child_name !== undefined) updateData.child_name = child_name;
+    if (school_name !== undefined) updateData.school_name = school_name;
+    if (grade_class !== undefined) updateData.grade_class = grade_class;
+    if (pickup_address !== undefined) updateData.pickup_address = pickup_address;
+    if (drop_address !== undefined) updateData.drop_address = drop_address;
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ success: false, message: "No data provided to update" });
     }
@@ -174,15 +221,17 @@ export const updateDriverProfile = async (req, res) => {
       vehicle_number,
       vehicle_type,
       license_number,
+      years_experience,
       vehicle_seats,
       profile_photo,
     } = req.body;
     const updateData = {};
-    if (vehicle_number) updateData.vehicle_number = vehicle_number;
-    if (vehicle_type) updateData.vehicle_type = vehicle_type;
-    if (license_number) updateData.license_number = license_number;
-    if (vehicle_seats !== undefined) updateData.vehicle_seats = vehicle_seats;
-    if (profile_photo) updateData.profile_photo = profile_photo;
+    if (vehicle_number !== undefined) updateData.vehicle_number = vehicle_number;
+    if (vehicle_type !== undefined) updateData.vehicle_type = vehicle_type;
+    if (license_number !== undefined) updateData.license_number = license_number;
+    if (years_experience !== undefined && years_experience !== '') updateData.years_experience = Number(years_experience);
+    if (vehicle_seats !== undefined && vehicle_seats !== '') updateData.vehicle_seats = Number(vehicle_seats);
+    if (profile_photo !== undefined) updateData.profile_photo = profile_photo;
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ success: false, message: "No data provided to update" });
     }
@@ -219,46 +268,53 @@ export const changeLanguage = async (req, res) => {
   }
 };
 
-export const deleteAccount = async (req, res) => {
-  try {
+export const deleteAccount = async (req,res)=>{
+  try{
     const userId = req.user?.id;
 
-    if (!userId) {
+    if(!userId){
       return res.status(401).json({
-        success: false,
-        message: "Unauthorized"
+        success:false,
+        message:"Unauthorized"
       });
     }
 
     const user = await userModel.findById(userId);
 
-    if (!user) {
+    if(!user){
       return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
+        success:false,
+        message:"User not found"
+      })
     }
 
+    // Ensure parent profile is removed as requested.
+    if (user.role === 'parent') {
+      await parentProfile.deleteOne({ user_id: user._id });
+    }
 
-    await notificationModel.deleteMany({ user_id: userId });
-    await SupportTicket.deleteMany({ user_id: userId });
+    await userModel.findByIdAndDelete(user._id);
 
-    await userModel.findByIdAndDelete(userId);
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
 
     return res.json({
-      success: true,
-      message: "Account deleted successfully"
-    });
+      success:true,
+      message:"Account deleted successfully"
+    })
 
-  } catch (error) {
-    console.error("Delete Account Error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
   }
-};
+  catch(error){
+    console.log("Delete account error:",error)
+    res.status(500).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
 
 export const createSupportTicket = async (req, res) => {
   try {
@@ -293,4 +349,3 @@ export const getNotifications = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-

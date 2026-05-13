@@ -63,6 +63,29 @@ bookingModel.findByIdAndDelete = async (id) => {
 };
 
 
+// --- VEHICLE MODEL MOCK SETUP --- //
+import vehicleModel from '../models/vehicleModel.js';
+
+// track calls to the atomic update functions and control return values
+let seatUpdates = [];
+let rollbackUpdates = [];
+let nextVehicleAvailable = true; // toggle behaviour per test
+
+vehicleModel.findOneAndUpdate = (query, update, options) => {
+    seatUpdates.push({ query, update, options });
+    if (!nextVehicleAvailable) {
+        return Promise.resolve(null);
+    }
+    // mimic updated document by returning an object with new available_seats
+    const newSeats = (query.available_seats && query.available_seats.$gt === 0) ? 0 : undefined;
+    return Promise.resolve({ _id: query._id, available_seats: newSeats });
+};
+
+vehicleModel.findByIdAndUpdate = (id, update) => {
+    rollbackUpdates.push({ id, update });
+    return Promise.resolve({ _id: id });
+};
+
 // ---- HELPER FOR MOCKING REQ/RES ---- //
 const mockResponse = () => {
     const res = {};
@@ -76,6 +99,24 @@ const mockResponse = () => {
 };
 
 // ---- TESTS ---- //
+
+// additional seat-concurrency-specific tests
+
+// helper used by several seat tests
+function baseReq() {
+    return {
+        user: { id: 'parent123' },
+        body: {
+            driver_id: 'driver456',
+            route_id: 'route789',
+            trip_id: 'trip123',
+            vehicle: 'veh123',
+            child_name: 'QA First Last',
+            pickup_point: 'Home',
+            drop_point: 'School'
+        }
+    };
+}
 
 test('1. createBooking - successful creation', async () => {
     mockDatabase = []; // reset state
@@ -105,6 +146,9 @@ test('1. createBooking - successful creation', async () => {
 
 test('2. createBooking - missing fields', async () => {
     mockDatabase = [];
+    seatUpdates = [];
+    nextVehicleAvailable = true;
+
     const req = {
         user: { id: 'parent123' },
         body: {
@@ -120,9 +164,57 @@ test('2. createBooking - missing fields', async () => {
     assert.strictEqual(res.getStatus(), 400);
     assert.strictEqual(res.getJson().message, 'All required fields must be provided');
     assert.strictEqual(mockDatabase.length, 0);
+    // ensure we never attempted a seat update because we failed early
+    assert.strictEqual(seatUpdates.length, 0);
 });
 
-test('3. updateBookingStatus - valid update by driver', async () => {
+// seat concurrency test: no seats available
+test('3. createBooking - fail when no seats available', async () => {
+    mockDatabase = [];
+    seatUpdates = [];
+    nextVehicleAvailable = false; // simulate vehicle already full
+
+    const req = baseReq();
+    const res = mockResponse();
+    const next = (err) => { throw err; };
+
+    await bookingController.createBooking(req, res, next);
+
+    assert.strictEqual(res.getStatus(), 400);
+    assert.strictEqual(res.getJson().message, 'No seats available');
+    assert.strictEqual(mockDatabase.length, 0);
+    assert.strictEqual(seatUpdates.length, 1);
+});
+
+// rollback test: if saving booking fails due to duplicate, seats should be restored
+test('4. createBooking - rollback when booking duplicate error', async () => {
+    mockDatabase = [];
+    seatUpdates = [];
+    rollbackUpdates = [];
+    nextVehicleAvailable = true;
+
+    // make save throw on first attempt
+    bookingModel.prototype.save = async function () {
+        const err = new Error('dup');
+        err.code = 11000;
+        throw err;
+    };
+
+    const req = baseReq();
+    const res = mockResponse();
+    const next = (err) => { throw err; };
+
+    await bookingController.createBooking(req, res, next);
+
+    assert.strictEqual(res.getStatus(), 400);
+    assert.strictEqual(res.getJson().message, 'A booking for this parent and trip already exists');
+    assert.strictEqual(mockDatabase.length, 0);
+    assert.strictEqual(seatUpdates.length, 1);
+    assert.strictEqual(rollbackUpdates.length, 1);
+});
+
+
+test('5. updateBookingStatus - valid update by driver', async () => {
     mockDatabase = [];
     mockDatabase.push({
         _id: 'mock_edit_1',
@@ -145,7 +237,7 @@ test('3. updateBookingStatus - valid update by driver', async () => {
     assert.strictEqual(res.getJson().data.status, 'accepted');
 });
 
-test('4. updateTripStatus - block invalid status', async () => {
+test('6. updateTripStatus - block invalid status', async () => {
     mockDatabase = [];
     mockDatabase.push({
         _id: 'mock_trip_1',
@@ -168,12 +260,14 @@ test('4. updateTripStatus - block invalid status', async () => {
     assert.strictEqual(res.getJson().message, 'Invalid trip status');
 });
 
-test('5. deleteBooking - parent securely deletes pending booking', async () => {
+test('7. deleteBooking - parent securely deletes pending booking', async () => {
     mockDatabase = [];
+    rollbackUpdates = [];
     mockDatabase.push({
         _id: 'mock_del_1',
         parent_id: 'parent123',
-        status: 'pending'
+        status: 'pending',
+        vehicle: 'veh123'
     });
 
     const req = {
@@ -187,4 +281,7 @@ test('5. deleteBooking - parent securely deletes pending booking', async () => {
 
     assert.strictEqual(res.getStatus(), 200);
     assert.strictEqual(mockDatabase.length, 0); // successfully deleted
+    // verify vehicle seat increment called
+    assert.strictEqual(rollbackUpdates.length, 1);
+    assert.deepStrictEqual(rollbackUpdates[0].update, { $inc: { available_seats: 1 } });
 });

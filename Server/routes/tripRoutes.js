@@ -3,18 +3,18 @@ import { createTrip, getTrips, updateTripStatus, getTripDetails } from '../contr
 import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 import RoleMiddleware from '../middlewares/RoleMiddleware.js';
 
-const router = express.Router();
+const tripRouter = express.Router();
 
-router.use(AuthMiddleware);
+tripRouter.use(AuthMiddleware);
 
-router.route('/')
+tripRouter.route('/')
     .post(RoleMiddleware('admin', 'manager'), createTrip)
     .get(getTrips);
 
-router.route('/:id/status')
+tripRouter.route('/:id/status')
     .put(RoleMiddleware('driver', 'admin', 'manager'), updateTripStatus);
 
-router.route('/:id')
+tripRouter.route('/:id')
     .get(getTripDetails);
 
-export default router;
+export default tripRouter;

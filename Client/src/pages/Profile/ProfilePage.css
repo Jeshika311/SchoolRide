@@ -1,0 +1,142 @@
+.profile-shell {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-header {
+  background: linear-gradient(135deg, #0b76ff 0%, #1e9bff 100%);
+  color: #fff;
+  padding: 28px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fff;
+  color: #0b76ff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.profile-info .profile-name {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.profile-info .profile-phone {
+  opacity: 0.95;
+  margin-top: 6px;
+}
+
+.profile-menu {
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #fff;
+  border: none;
+  padding: 14px 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+  cursor: pointer;
+  text-align: left;
+}
+
+.menu-item .menu-icon { width: 36px; text-align:center }
+.menu-item .menu-label { font-weight: 600 }
+
+.menu-item.danger { background: #fff6f6; color: #b91c1c }
+
+/* Settings panel styles */
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-header h3 { margin: 0; font-size: 20px; font-weight:700 }
+.back-btn {
+  background: #ffffff;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #0b1115;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-grid;
+  place-items: center;
+  box-shadow: 0 1px 6px rgba(2,6,23,0.06);
+}
+
+.settings-list { display: flex; flex-direction: column; gap: 10px }
+
+.toggle-row { justify-content: space-between; gap: 10px }
+
+.toggle-left { display: flex; gap: 12px; align-items: center }
+
+/* Simple switch control */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px }
+.switch input { opacity: 0; width: 0; height: 0 }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e6e9ef; transition: .2s; border-radius: 999px }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; top: 3px; background: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(2,6,23,0.12) }
+.switch input:checked + .slider { background: #0b76ff }
+.switch input:checked + .slider:before { transform: translateX(20px) }
+
+@media (max-width: 600px) {
+  .profile-drawer, .profile-shell { width: 100%; }
+  .profile-header { padding: 20px; }
+  .profile-avatar { width: 56px; height: 56px; font-size: 18px }
+  .menu-item { padding: 12px 10px }
+  .menu-item .menu-icon { width: 32px }
+}
+
+/* Settings card */
+.settings-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 1px 4px rgba(2,6,23,0.06);
+}
+.settings-title { font-weight: 700; margin-bottom: 12px }
+.settings-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 12px 6px;
+  text-align: left;
+  cursor: pointer;
+}
+.settings-top .settings-item { padding: 12px 6px; }
+.settings-icon { width: 40px; display: inline-flex; align-items:center; justify-content:center }
+.settings-label { font-weight: 600 }
+.divider { border-bottom: 1px dashed #e6e9ef; margin: 6px 0 }
+
+@media (max-width: 420px) {
+  .settings-card { padding: 12px }
+  .settings-icon { width: 36px }
+}
+

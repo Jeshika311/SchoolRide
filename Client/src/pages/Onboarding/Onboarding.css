@@ -1,0 +1,446 @@
+.onboarding-root{
+  min-height:100dvh;
+  width:100%;
+  display:flex;
+  align-items:stretch;
+  justify-content:stretch;
+  background:#ffffff;
+  overflow:hidden;
+}
+
+.onboarding-card{
+  width:100%;
+  height:100dvh;
+  min-height:100dvh;
+  max-width:none;
+  background:#ffffff;
+  border-radius:0;
+  padding:clamp(6px, 1.2vw, 12px) clamp(10px, 2.4vw, 18px) calc(clamp(10px, 2vw, 16px) + env(safe-area-inset-bottom));
+  box-shadow:none;
+  position:relative;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  overflow:hidden;
+  padding-top: 70px;
+}
+
+.choose-screen{
+  width:100%;
+  min-height:100dvh;
+  padding:clamp(20px, 3vw, 40px) clamp(16px, 3vw, 30px) clamp(20px, 3vw, 36px);
+  box-sizing:border-box;
+}
+
+.choose-title{
+  margin:clamp(8px, 1.8vh, 18px) 0 clamp(20px, 4vh, 34px);
+  font-size:clamp(22px, 2.6vw, 34px);
+  line-height:1.1;
+  font-weight:700;
+  color:#152238;
+  text-align:center;
+}
+
+.skip-btn{
+  position:absolute;
+  right:clamp(16px, 4vw, 24px);
+  top:clamp(6px, 1.6vw, 12px);
+  background:transparent;
+  border:none;
+  color:#374151;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.onboarding-image{
+  margin-top:clamp(10px, 2.4vh, 20px);
+}
+
+.onboarding-image img{
+  width:clamp(220px, 68vw, 360px);
+  height:auto;
+  margin:0 auto;
+  display:block;
+}
+
+.onboarding-content{
+  margin-top:clamp(6px, 1.2vh, 12px);
+}
+
+.onboarding-content h3{
+  margin:0 0 6px;
+  font-size:clamp(18px, 3.8vw, 22px);
+  line-height:1.15;
+  color:#111827;
+  font-weight:700;
+}
+
+.onboarding-content p{
+  color:#6b7280;
+  font-size:clamp(12px, 2.6vw, 14px);
+  line-height:1.35;
+  margin:0 auto;
+  max-width:clamp(260px, 80vw, 420px);
+}
+
+.onboarding-footer{
+  margin-top:auto;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  padding-top:clamp(2px, 0.8vh, 8px);
+  position:relative;
+  padding-bottom: 140px;
+  padding-left: 220px;
+}
+
+.dots{
+  display:flex;
+  gap:clamp(5px, 1.2vw, 8px);
+  align-items:center;
+  padding-left:4px;
+  padding-bottom:clamp(2px, 0.8vh, 6px);
+}
+
+.dot{
+  width:clamp(8px, 2vw, 10px);
+  height:clamp(8px, 2vw, 10px);
+  background:#d7dbe2;
+  border-radius:50%;
+  display:inline-block;
+}
+
+.dot.active{
+  background:#2f80ed;
+}
+
+.next-btn{
+  position:absolute;
+  right:0;
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+}
+
+.next-btn img{
+  width:clamp(76px, 15vw, 96px);
+  height:clamp(76px, 15vw, 96px);
+  object-fit:contain;
+  display:block;
+}
+
+.account-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(16px, 2.2vw, 26px);
+  width:min(100%, 1880px);
+  margin: 80px 30px;
+
+}
+
+.account-card{
+  display:flex;
+  flex-direction:column;
+  width:90%;
+  padding:0;
+  border-radius:16px;
+  border:1px solid #dfe8f4;
+  background:#fff;
+  overflow:hidden;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(16,24,40,0.08);
+}
+
+.account-card:hover{
+  box-shadow:0 6px 18px rgba(16,24,40,0.12);
+  transform:translateY(-1px);
+}
+
+.account-hero{
+  width:100%;
+  aspect-ratio: 16 / 7;
+  background:#f8fbff;
+  overflow:hidden;
+}
+
+.account-hero img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  border-radius:16px 16px 0 0;
+}
+
+.account-body-row{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:clamp(12px, 1.5vw, 18px);
+  padding:clamp(14px, 1.8vw, 22px) clamp(14px, 2vw, 24px) clamp(14px, 1.8vw, 20px);
+  position:static;
+  background:transparent;
+  backdrop-filter:none;
+}
+
+.account-icon{
+  width:clamp(40px, 4vw, 52px);
+  height:clamp(40px, 4vw, 52px);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:clamp(18px, 1.8vw, 24px);
+  flex:0 0 auto;
+}
+
+.parent-icon{
+  background:#d43a21;
+}
+
+.driver-icon{
+  background:#e0323c;
+}
+
+.account-body{
+  text-align:left;
+  min-width:0;
+}
+
+.account-body strong{
+  display:block;
+  font-size:clamp(20px, 2vw, 30px);
+  line-height:1.1;
+  color:#0f172a;
+}
+
+.account-body small{
+  color:#5f6f86;
+  font-size:clamp(13px, 1.1vw, 18px);
+  line-height:1.3;
+}
+
+.account-chevron{
+  font-size:clamp(28px, 2.4vw, 42px);
+  color:#111827;
+  line-height:1;
+  padding-left:clamp(8px, 1vw, 14px);
+}
+
+@media(min-width:720px){
+  .onboarding-image{
+    margin-top:clamp(18px, 3vh, 28px);
+  }
+
+  .onboarding-image img{
+    width:clamp(300px, 30vw, 380px);
+  }
+
+  .onboarding-content h3{
+    font-size:clamp(20px, 1.8vw, 24px);
+  }
+
+  .next-btn img{
+    width:clamp(88px, 9vw, 112px);
+    height:clamp(88px, 9vw, 112px);
+  }
+
+  .account-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+  .account-hero{
+    aspect-ratio: 16 / 6.5;
+  }
+  .account-hero .img{
+    object-fit:cover;
+    object-position:left center;
+  }
+}
+
+@media(min-width:1200px){
+  .choose-screen{
+    padding-inline:clamp(26px, 2vw, 36px);
+  }
+
+  .account-grid{
+    gap:clamp(20px, 2vw, 28px);
+  }
+
+  .account-body-row{
+    padding:clamp(16px, 1.5vw, 24px) clamp(18px, 1.8vw, 26px) clamp(16px, 1.5vw, 24px);
+  }
+
+  /* On very wide screens focus the visible area to the left so characters appear */
+  .account-hero img{
+    /* show full image on large screens */
+    object-fit:contain;
+    object-position:center;
+    background:#f8fbff;
+    width:auto;
+    height:100%;
+  }
+
+  /* increase hero height on large screens so the panorama has room */
+  .account-hero{
+    aspect-ratio: 16 / 5;
+  }
+}
+
+/* Phone Screens (max-width: 480px) */
+@media (max-width: 480px) {
+  .onboarding-root {
+    align-items: flex-start;
+  }
+
+  .onboarding-card {
+    padding-top: 50px;
+    padding-left: clamp(8px, 2vw, 12px);
+    padding-right: clamp(8px, 2vw, 12px);
+  }
+
+  .skip-btn {
+    right: clamp(12px, 3vw, 16px);
+    top: clamp(4px, 1.4vw, 8px);
+    font-size: 14px;
+  }
+
+  .onboarding-image {
+    margin-top: clamp(8px, 1.8vh, 16px);
+  }
+
+  .onboarding-image img {
+    width: clamp(200px, 60vw, 300px);
+    height: auto;
+  }
+
+  .onboarding-content {
+    margin-top: clamp(4px, 1vh, 10px);
+  }
+
+  .onboarding-content h3 {
+    font-size: clamp(16px, 4vw, 20px);
+    margin: 0 0 4px;
+  }
+
+  .onboarding-content p {
+    font-size: clamp(11px, 2.4vw, 13px);
+    line-height: 1.3;
+  }
+
+  .onboarding-footer {
+    padding-bottom: 100px;
+    padding-left: 0;
+  }
+
+  .dots {
+    gap: clamp(4px, 1vw, 6px);
+  }
+
+  .dot {
+    width: clamp(6px, 1.5vw, 8px);
+    height: clamp(6px, 1.5vw, 8px);
+  }
+
+  .next-btn img {
+    width: clamp(64px, 14vw, 80px);
+    height: clamp(64px, 14vw, 80px);
+  }
+
+  .choose-screen {
+    padding: clamp(16px, 3vw, 24px) clamp(12px, 3vw, 20px);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .choose-title {
+    font-size: clamp(20px, 5vw, 28px);
+    margin: clamp(8px, 2vh, 16px) 0 clamp(24px, 4vh, 36px);
+    font-weight: 700;
+  }
+
+  .account-grid {
+    grid-template-columns: 1fr;
+    gap: clamp(12px, 2vw, 16px);
+    margin: clamp(20px, 3vh, 40px) 0;
+    width: 100%;
+  }
+
+  .account-card {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .account-hero {
+    aspect-ratio: 16 / 6;
+  }
+
+  .account-body-row {
+    gap: clamp(10px, 1.5vw, 14px);
+    padding: clamp(12px, 1.5vw, 16px) clamp(12px, 1.8vw, 16px);
+  }
+
+  .account-icon {
+    width: clamp(36px, 3.5vw, 44px);
+    height: clamp(36px, 3.5vw, 44px);
+    font-size: clamp(16px, 1.8vw, 20px);
+  }
+
+  .account-body strong {
+    font-size: clamp(16px, 2.2vw, 22px);
+  }
+
+  .account-body small {
+    font-size: clamp(11px, 1.2vw, 13px);
+  }
+
+  .account-chevron {
+    font-size: clamp(20px, 2vw, 28px);
+    padding-left: clamp(6px, 0.8vw, 10px);
+  }
+}
+
+@media (max-width: 360px) {
+  .onboarding-card {
+    padding-top: 40px;
+  }
+
+  .onboarding-image img {
+    width: clamp(180px, 55vw, 260px);
+  }
+
+  .onboarding-content h3 {
+    font-size: clamp(14px, 4vw, 18px);
+  }
+
+  .onboarding-content p {
+    font-size: 11px;
+  }
+
+  .choose-title {
+    font-size: clamp(16px, 4vw, 22px);
+  }
+
+  .account-grid {
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .account-body-row {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .account-body strong {
+    font-size: 16px;
+  }
+
+  .account-body small {
+    font-size: 10px;
+  }
+}

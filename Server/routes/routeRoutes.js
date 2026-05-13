@@ -3,17 +3,17 @@ import { createRoute, getRoutes, getRouteById, deleteRoute } from '../controller
 import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 import RoleMiddleware from '../middlewares/RoleMiddleware.js';
 
-const router = express.Router();
+const routeRouter = express.Router();
 
 // Apply AuthMiddleware to all route endpoints to ensure security (Production Grade)
-router.use(AuthMiddleware);
+routeRouter.use(AuthMiddleware);
 
-router.route('/')
+routeRouter.route('/')
     .post(RoleMiddleware('admin', 'manager'), createRoute) // only admin/manager should create routes
     .get(getRoutes);
 
-router.route('/:id')
+routeRouter.route('/:id')
     .get(getRouteById)
     .delete(RoleMiddleware('admin', 'manager'), deleteRoute);
 
-export default router;
+export default routeRouter;
