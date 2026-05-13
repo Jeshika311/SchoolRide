@@ -27,7 +27,11 @@ export const createRoute = expressAsyncHandler(async (req, res) => {
         driver,
         start_location,
         end_location,
-        stops: stops || []
+        stops: stops || [],
+        start_coords: mapDetails.start_coords,
+        end_coords: mapDetails.end_coords,
+        distance_km: mapDetails.distance_km,
+        duration_minutes: mapDetails.duration_minutes
     });
 
     res.status(201).json({
