@@ -54,7 +54,12 @@ export default function RegisterPage() {
 
     if (status === 201 || status === 200) {
       setMessage({ type: 'success', text: data.message || 'Account created successfully.' });
+      localStorage.setItem('authUser', JSON.stringify(data.user || payload));
       localStorage.setItem('registeredUser', JSON.stringify(data.user || payload));
+      localStorage.setItem('termsAccepted', data.user?.termsAccepted ? 'true' : 'false');
+      if (data.user?.role) {
+        localStorage.setItem('userRole', data.user.role);
+      }
       setFormData({
         name: '',
         email: '',

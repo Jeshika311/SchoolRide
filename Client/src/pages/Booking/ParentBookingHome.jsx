@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfilePage from '../Profile/ProfilePage';
+import NotificationBell from '../../components/Notification/NotificationBell';
 import './ParentBookingHome.css';
 
 export default function ParentBookingHome() {
@@ -100,7 +101,8 @@ export default function ParentBookingHome() {
               <p className="tagline">Book Your School Ride</p>
             </div>
           </div>
-          <div className="header-right">
+          <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <NotificationBell />
             <div className="header-nav">
               <div className="header-nav-item">
                 <span className="header-nav-icon">✓</span>

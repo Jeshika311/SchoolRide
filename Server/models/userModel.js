@@ -80,6 +80,14 @@ const userSchema = new mongoose.Schema({
   device_token: { 
     type: String, 
     default: null
+  },
+  termsAccepted: {
+    type: Boolean,
+    default: false
+  },
+  termsAcceptedAt: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true })
 

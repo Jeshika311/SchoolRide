@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+import { initializeSockets } from './sockets/socketManager.js';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -21,6 +24,7 @@ import routeRouter from './routes/routeRoutes.js';
 import tripRouter from './routes/tripRoutes.js';
 import NotificationRouter from './routes/notificationRoutes.js';
 import locationRouter from './routes/locationRoutes.js';
+import transportRouter from './routes/transportEventRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -70,6 +74,7 @@ app.use('/api/routes', routeRouter);
 app.use('/api/trips', tripRouter);
 app.use('/api/notification', NotificationRouter);
 app.use('/api/location', locationRouter);
+app.use('/api/transport-events', transportRouter);
 
 // general informational endpoints
 app.use('/api', infoRouter);
@@ -77,6 +82,17 @@ app.use('/api', infoRouter);
 // Global Error Handler
 app.use(ErrorMiddleware);
 
-app.listen(PORT, () => {
+const httpServer = createServer(app);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true
+  }
+});
+
+initializeSockets(io);
+app.set('io', io);
+
+httpServer.listen(PORT, () => {
   logger.info(`Server safely started on http://localhost:${PORT}`)
 })

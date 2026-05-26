@@ -7,6 +7,7 @@ import './Login.css';
 export default function LoginPage() {
   const [method, setMethod] = useState('phone');
   const [form, setForm] = useState({ phone: '', email: '', password: '' });
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
@@ -16,6 +17,12 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage(null);
+
+    if (!acceptTerms) {
+      setMessage({ type: 'error', text: 'Please accept the Terms & Conditions and Privacy Policy to continue.' });
+      return;
+    }
+
     setLoading(true);
 
     const payload = {
@@ -34,6 +41,7 @@ export default function LoginPage() {
 
     if (status === 200) {
       localStorage.setItem('authUser', JSON.stringify(data.user || {}));
+      localStorage.setItem('termsAccepted', data.user?.termsAccepted ? 'true' : 'false');
       if (data.user?.role) {
         localStorage.setItem('userRole', data.user.role);
       }
@@ -73,6 +81,20 @@ export default function LoginPage() {
             <label className="field-label">Password</label>
             <input name="password" value={form.password} onChange={handleChange} className="password-input" type="password" placeholder="Password" required />
           </div>
+
+          <label className="checkbox-row" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '14px', marginBottom: '14px', textAlign: 'left', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              name="acceptTerms"
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              required
+              style={{ cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: '12px', color: '#64748b', lineHeight: 1.4 }}>
+              I have read and agree to the <Link to="/terms" style={{ color: '#0b76ff', fontWeight: 600 }}>Terms & Conditions</Link> & <Link to="/privacy" style={{ color: '#0b76ff', fontWeight: 600 }}>Privacy Policy</Link>
+            </span>
+          </label>
 
           <button className="big-btn" type="submit" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
 

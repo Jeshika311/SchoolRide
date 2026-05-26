@@ -62,7 +62,9 @@ export const register = async (req, res) => {
       role,
       phone_number,
       preferred_language,
-      device_token: incomingToken || null
+      device_token: incomingToken || null,
+      termsAccepted: false,
+      termsAcceptedAt: null
     })
     await user.save();
 
@@ -92,7 +94,8 @@ export const register = async (req, res) => {
         role: user.role,
         phone_number: user.phone_number,
         preferred_language: user.preferred_language,
-        device_token: user.device_token
+        device_token: user.device_token,
+        termsAccepted: user.termsAccepted
       }
     })
   }
@@ -267,7 +270,8 @@ export const login = async (req,res) => {
         role: user.role,
         phone_number: user.phone_number,
         preferred_language: user.preferred_language,
-        device_token: user.device_token
+        device_token: user.device_token,
+        termsAccepted: user.termsAccepted
       }
      })
   }
@@ -314,7 +318,9 @@ export const googleLogin = async (req, res) => {
         role: "parent",
         preferred_language: "English",
         isAccountVerified: true,
-        device_token: incomingToken || null
+        device_token: incomingToken || null,
+        termsAccepted: false,
+        termsAcceptedAt: null
       });
 
       await user.save();
@@ -367,13 +373,56 @@ export const googleLogin = async (req, res) => {
         phone_number: user.phone_number,
         preferred_language: user.preferred_language,
         fcmTokens: user.fcmTokens,
-        google_id: user.google_id
+        google_id: user.google_id,
+        termsAccepted: user.termsAccepted
       }
     });
 
   } catch (error) {
     console.log("Google Login error:", error);
 
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const acceptTerms = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.termsAccepted = true;
+    user.termsAcceptedAt = new Date();
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Terms accepted successfully',
+      user: {
+        id: user._id,
+        termsAccepted: user.termsAccepted,
+        termsAcceptedAt: user.termsAcceptedAt
+      }
+    });
+  } catch (error) {
+    console.log('Accept terms error:', error);
     return res.status(500).json({
       success: false,
       message: error.message

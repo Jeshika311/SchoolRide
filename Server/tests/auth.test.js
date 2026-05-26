@@ -59,7 +59,9 @@ const createFakeUser = async () => {
     phone_number: '1234567890',
     password: hashed,
     role: 'parent',
-    fcmTokens: []
+    device_token: null,
+    termsAccepted: false,
+    termsAcceptedAt: null
   };
 };
 
@@ -119,24 +121,24 @@ test('logout returns 401 if no token', async () => {
 test('logout succeeds when token present and removes fcm token', async () => {
   await createFakeUser();
   // ensure user has a device token to remove
-  fakeUser.fcmTokens = ['tokA'];
+  fakeUser.device_token = 'tokA';
   const token = generateToken(fakeUser);
   const req = { body: { device_token: 'tokA' }, cookies: { token } , headers: {} };
   const res = mockResponse();
   await authController.logout(req, res);
   assert.strictEqual(res.getStatus(), 200);
-  assert(fakeUser.fcmTokens.length === 0);
+  assert(fakeUser.device_token === null);
 });
 
 test('logout works with Authorization header as Bearer token', async () => {
   await createFakeUser();
-  fakeUser.fcmTokens = ['hdrTok'];
+  fakeUser.device_token = 'hdrTok';
   const token = generateToken(fakeUser);
   const req = { body: { device_token: 'hdrTok' }, cookies: {}, headers: { authorization: `Bearer ${token}` } };
   const res = mockResponse();
   await authController.logout(req, res);
   assert.strictEqual(res.getStatus(), 200);
-  assert(fakeUser.fcmTokens.length === 0);
+  assert(fakeUser.device_token === null);
 });
 
 
@@ -152,4 +154,21 @@ test('terms endpoint returns static text', () => {
   const res = mockResponse();
   getTerms({}, res);
   assert(res.getJson().terms);
+});
+
+test('acceptTerms controller updates user record', async () => {
+  await createFakeUser();
+  const req = { user: { id: 'user123' } };
+  const res = mockResponse();
+  await authController.acceptTerms(req, res);
+  assert.strictEqual(res.getStatus(), 200);
+  assert.strictEqual(fakeUser.termsAccepted, true);
+  assert(fakeUser.termsAcceptedAt);
+});
+
+test('acceptTerms returns 401 if unauthorized', async () => {
+  const req = {};
+  const res = mockResponse();
+  await authController.acceptTerms(req, res);
+  assert.strictEqual(res.getStatus(), 401);
 });

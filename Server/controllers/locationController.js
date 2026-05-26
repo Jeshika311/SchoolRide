@@ -2,6 +2,13 @@ import expressAsyncHandler from 'express-async-handler';
 import mongoose from 'mongoose';
 import locationModel from '../models/locationModel.js';
 import tripModel from '../models/tripModel.js';
+import routeModel from '../models/routeModel.js';
+import bookingModel from '../models/bookingModel.js';
+import transportEventModel from '../models/transportEventModel.js';
+import { checkGeofenceTrigger } from '../utils/geofenceHelper.js';
+import { detectTripAnomalies } from '../utils/etaHelper.js';
+import { emitToTrip, emitToUser } from '../sockets/socketManager.js';
+import { sendNotificationToUser } from '../utils/sendNotification.js';
 
 const toPoint = (longitude, latitude) => ({
 	type: 'Point',
@@ -16,7 +23,7 @@ const toPoint = (longitude, latitude) => ({
 export const createLocation = expressAsyncHandler(async (req, res) => {
 	const { trip_id, longitude, latitude, speed = 0 } = req.body;
 
-	const trip = await tripModel.findById(trip_id).select('_id');
+       const trip = await tripModel.findById(trip_id);
 	if (!trip) {
 		return res.status(404).json({ success: false, message: 'Trip not found' });
 	}
@@ -26,6 +33,127 @@ export const createLocation = expressAsyncHandler(async (req, res) => {
 		location: toPoint(longitude, latitude),
 		speed
 	});
+
+       const route = await routeModel.findById(trip.route_id);
+       const driverCoords = { lat: latitude, lon: longitude };
+
+       emitToTrip(trip_id, 'cab_location_broadcast', {
+	       tripId: trip_id,
+	       latitude,
+	       longitude,
+	       speed,
+	       timestamp: new Date()
+       });
+
+       if (route) {
+	       const anomaly = detectTripAnomalies(route, driverCoords, speed);
+
+	       if (anomaly.isDelayed) {
+		       const recentDelay = await transportEventModel.findOne({
+			       trip_id,
+			       event_type: 'cab_delayed',
+			       createdAt: { $gte: new Date(Date.now() - 5 * 60 * 1000) }
+		       });
+
+		       if (!recentDelay) {
+			       await transportEventModel.create({
+				       trip_id,
+				       cab_id: trip.vehicle,
+				       event_type: 'cab_delayed',
+				       description: `Cab is taking longer than usual: ${anomaly.delayReason}`,
+				       location: toPoint(longitude, latitude),
+				       speed,
+				       eta_minutes: anomaly.updatedEta
+			       });
+
+			       const bookings = await bookingModel.find({ trip_id, status: 'accepted' });
+				       for (const booking of bookings) {
+					       const sent = await sendNotificationToUser({
+					       userId: booking.parent_id,
+					       title: 'Delay Alert ⚠️',
+					       message: `Your school cab is delayed. Estimated arrival: ${anomaly.updatedEta} mins. Reason: ${anomaly.delayReason}`,
+					       type: 'delay',
+					       data: { tripId: String(trip_id), eta: String(anomaly.updatedEta) }
+				       });
+
+				       emitToUser(booking.parent_id, 'new_notification', {
+						       id: sent.notification?._id,
+					       title: 'Delay Alert ⚠️',
+					       message: `Your school cab is delayed. Reason: ${anomaly.delayReason}`,
+					       type: 'delay'
+				       });
+			       }
+		       }
+	       }
+
+	       if (route.end_coords && checkGeofenceTrigger(driverCoords, route.end_coords, 300)) {
+		       const arrivedSchool = await transportEventModel.findOne({ trip_id, event_type: 'cab_arrived_school' });
+
+		       if (!arrivedSchool) {
+			       await transportEventModel.create({
+				       trip_id,
+				       cab_id: trip.vehicle,
+				       event_type: 'cab_arrived_school',
+				       description: 'Cab has arrived near the school campus',
+				       location: toPoint(longitude, latitude),
+				       speed,
+				       eta_minutes: 0
+			       });
+
+			       const bookings = await bookingModel.find({ trip_id, status: 'accepted' });
+				       for (const booking of bookings) {
+					       const sent = await sendNotificationToUser({
+					       userId: booking.parent_id,
+					       title: 'Arrived at School 🏫',
+					       message: `The cab carrying ${booking.child_name} has arrived safely near the school campus.`,
+					       type: 'safety',
+					       data: { tripId: String(trip_id) }
+				       });
+
+				       emitToUser(booking.parent_id, 'new_notification', {
+						       id: sent.notification?._id,
+					       title: 'Arrived at School 🏫',
+					       message: 'The cab has arrived safely near the school campus.',
+					       type: 'safety'
+				       });
+			       }
+		       }
+	       }
+
+	       if (route.start_coords && checkGeofenceTrigger(driverCoords, route.start_coords, 300)) {
+		       const arrivedPickup = await transportEventModel.findOne({ trip_id, event_type: 'cab_arrived_pickup' });
+
+		       if (!arrivedPickup) {
+			       await transportEventModel.create({
+				       trip_id,
+				       cab_id: trip.vehicle,
+				       event_type: 'cab_arrived_pickup',
+				       description: 'Cab is approaching the pickup location',
+				       location: toPoint(longitude, latitude),
+				       speed,
+				       eta_minutes: anomaly.updatedEta
+			       });
+
+			       const bookings = await bookingModel.find({ trip_id, status: 'accepted' });
+				       for (const booking of bookings) {
+					       const sent = await sendNotificationToUser({
+					       userId: booking.parent_id,
+					       title: 'Cab Approaching 🚖',
+					       message: 'Your school cab is approaching the pickup point. Please get ready.',
+					       type: 'general',
+					       data: { tripId: String(trip_id) }
+				       });
+
+				       emitToUser(booking.parent_id, 'new_notification', {
+						       id: sent.notification?._id,
+					       title: 'Cab Approaching 🚖',
+					       message: 'Your school cab is approaching the pickup point.',
+					       type: 'general'
+				       });
+			       }
+		       }
+	       }
+       }
 
 	res.status(201).json({
 		success: true,

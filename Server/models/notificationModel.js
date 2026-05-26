@@ -6,9 +6,45 @@ const notificationSchema = new mongoose.Schema({
     ref: 'user',
     required: true
   },
+  receiverId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    default: function () {
+      return this.user;
+    }
+  },
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    default: null
+  },
+  childId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'parentProfile',
+    default: null
+  },
+  cabId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'vehicle',
+    default: null
+  },
+  routeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'route',
+    default: null
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'normal', 'high', 'emergency'],
+    default: 'normal'
+  },
+  redirectUrl: {
+    type: String,
+    default: ''
+  },
   type: {
     type: String,
-    enum: ['general', 'booking', 'trip', 'system', 'alert'],
+    enum: ['general', 'booking', 'trip', 'system', 'alert', 'safety', 'delay'],
     default: 'general'
   },
   title: {

@@ -1,7 +1,9 @@
 import './App.css';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NotificationProvider } from './context/NotificationContext';
+import NotificationsPage from './pages/Notifications/NotificationsPage';
+import TermsAcceptModal from './components/Terms/TermsAcceptModal';
 import Onboarding from './pages/Onboarding/Onboarding';
 import RegisterPage from './pages/Register/RegisterPage';
 import ProfileCompletion from './pages/Register/ProfileCompletion';
@@ -40,13 +42,17 @@ function HomeRoute() {
   );
 }
 
-function App() {
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || null);
   const [onboardingComplete, setOnboardingComplete] = useState(
     localStorage.getItem('onboardingComplete') === 'true' || false
   );
+  const hasAuthenticatedUser = Boolean(localStorage.getItem('authUser'));
+  const termsAccepted = localStorage.getItem('termsAccepted') === 'true';
 
-  const handleOnboardingFinish = (role, navigate) => {
+  const handleOnboardingFinish = (role) => {
     if (role) {
       localStorage.setItem('userRole', role);
       setUserRole(role);
@@ -56,16 +62,18 @@ function App() {
     navigate('/register', { replace: true });
   };
 
-  function OnboardingRoute() {
-    const navigate = useNavigate();
+  const handleTermsAccept = () => {
+    localStorage.setItem('termsAccepted', 'true');
+  };
 
-    return <Onboarding onFinish={(role) => handleOnboardingFinish(role, navigate)} />;
-  }
+  const publicLegalRoutes = ['/terms', '/privacy', '/privacy-terms', '/privacy-policy', '/terms-conditions'];
+  const isPublicLegalRoute = publicLegalRoutes.includes(location.pathname.toLowerCase());
+  const showTermsModal = onboardingComplete && hasAuthenticatedUser && !termsAccepted && !isPublicLegalRoute;
 
   return (
-    <BrowserRouter>
+    <>
       <Routes>
-        <Route path="/" element={<OnboardingRoute />} />
+        <Route path="/" element={<Onboarding onFinish={handleOnboardingFinish} />} />
         <Route path="/register" element={onboardingComplete ? <RegisterPage /> : <Navigate to="/" replace />} />
         <Route path="/profile-completion" element={onboardingComplete ? <ProfileCompletion /> : <Navigate to="/" replace />} />
         <Route path="/login" element={onboardingComplete ? <LoginPage /> : <Navigate to="/" replace />} />
@@ -77,16 +85,29 @@ function App() {
         <Route path="/help" element={onboardingComplete ? <CustomerSupportPage /> : <Navigate to="/" replace />} />
         <Route path="/customer-support" element={onboardingComplete ? <CustomerSupportPage /> : <Navigate to="/" replace />} />
         <Route path="/faqs" element={onboardingComplete ? <FAQsPage /> : <Navigate to="/" replace />} />
-        <Route path="/privacy-terms" element={onboardingComplete ? <PrivacyTermsPage /> : <Navigate to="/" replace />} />
-        <Route path="/privacy-policy" element={onboardingComplete ? <PrivacyPolicyPage /> : <Navigate to="/" replace />} />
-        <Route path="/terms-conditions" element={onboardingComplete ? <TermsConditionsPage /> : <Navigate to="/" replace />} />
-        <Route path="/privacy" element={onboardingComplete ? <PrivacyPolicyPage /> : <Navigate to="/" replace />} />
-        <Route path="/terms" element={onboardingComplete ? <TermsConditionsPage /> : <Navigate to="/" replace />} />
+        <Route path="/privacy-terms" element={<PrivacyTermsPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms-conditions" element={<TermsConditionsPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsConditionsPage />} />
         <Route path="/forgot" element={onboardingComplete ? <ForgotPassword /> : <Navigate to="/" replace />} />
         <Route path="/verify" element={onboardingComplete ? <VerifyOtp /> : <Navigate to="/" replace />} />
         <Route path="/reset" element={onboardingComplete ? <ResetPassword /> : <Navigate to="/" replace />} />
+        <Route path="/notifications" element={onboardingComplete ? <NotificationsPage /> : <Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+
+      {showTermsModal && <TermsAcceptModal onAccept={handleTermsAccept} />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <NotificationProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </NotificationProvider>
   );
 }
 
