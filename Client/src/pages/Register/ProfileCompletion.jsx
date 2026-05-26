@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RegisterPage.css';
 
 export default function ProfileCompletion() {
-  const [userRole, setUserRole] = useState('parent');
+  const [userRole] = useState(() => localStorage.getItem('userRole') || 'parent');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
@@ -18,11 +18,6 @@ export default function ProfileCompletion() {
     vehicle_type: '',
     years_experience: '',
   });
-
-  useEffect(() => {
-    const role = localStorage.getItem('userRole') || 'parent';
-    setUserRole(role);
-  }, []);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;

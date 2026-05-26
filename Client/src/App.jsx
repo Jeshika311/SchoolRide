@@ -22,16 +22,34 @@ import AccountInfoPage from './pages/Profile/AccountInfoPage';
 import ChangePasswordPage from './pages/Profile/ChangePasswordPage';
 import VerifyOTPPage from './pages/Profile/VerifyOTPPage';
 
+// SchoolRide Pages
+import StudentDashboard from './pages/StudentDashboard';
+import BusListing from './pages/BusListing';
+import SeatSelection from './pages/SeatSelection';
+import PaymentPage from './pages/PaymentPage';
+import BookingHistory from './pages/BookingHistory';
+import LiveTracking from './pages/LiveTracking';
+import AdminDashboard from './pages/AdminDashboard';
+import ManageBuses from './pages/ManageBuses';
+import ManageBookings from './pages/ManageBookings';
+import PaymentRecords from './pages/PaymentRecords';
+import AdminTracking from './pages/AdminTracking';
+
 function HomeRoute() {
   const user = JSON.parse(localStorage.getItem('authUser') || '{}');
   const role = user.role || localStorage.getItem('userRole') || 'user';
 
-  // Show ParentBookingHome for parents
   if (role === 'parent') {
     return <ParentBookingHome />;
   }
+  if (role === 'student') {
+    return <StudentDashboard />;
+  }
+  if (role === 'admin') {
+    return <AdminDashboard />;
+  }
 
-  // Default welcome page for drivers or other roles
+  // Default welcome page
   return (
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '24px' }}>
       <div style={{ maxWidth: '520px', width: '100%', padding: '32px', borderRadius: '24px', background: '#fff', boxShadow: '0 20px 60px rgba(15, 23, 42, 0.12)' }}>
@@ -45,7 +63,6 @@ function HomeRoute() {
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || null);
   const [onboardingComplete, setOnboardingComplete] = useState(
     localStorage.getItem('onboardingComplete') === 'true' || false
   );
@@ -55,7 +72,6 @@ function AppContent() {
   const handleOnboardingFinish = (role) => {
     if (role) {
       localStorage.setItem('userRole', role);
-      setUserRole(role);
     }
     localStorage.setItem('onboardingComplete', 'true');
     setOnboardingComplete(true);
@@ -94,6 +110,19 @@ function AppContent() {
         <Route path="/verify" element={onboardingComplete ? <VerifyOtp /> : <Navigate to="/" replace />} />
         <Route path="/reset" element={onboardingComplete ? <ResetPassword /> : <Navigate to="/" replace />} />
         <Route path="/notifications" element={onboardingComplete ? <NotificationsPage /> : <Navigate to="/" replace />} />
+
+        {/* Student Routes */}
+        <Route path="/buses" element={onboardingComplete ? <BusListing /> : <Navigate to="/" replace />} />
+        <Route path="/seat-selection/:busId" element={onboardingComplete ? <SeatSelection /> : <Navigate to="/" replace />} />
+        <Route path="/payment/:bookingId" element={onboardingComplete ? <PaymentPage /> : <Navigate to="/" replace />} />
+        <Route path="/history" element={onboardingComplete ? <BookingHistory /> : <Navigate to="/" replace />} />
+        <Route path="/track/:busId" element={onboardingComplete ? <LiveTracking /> : <Navigate to="/" replace />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin/buses" element={onboardingComplete ? <ManageBuses /> : <Navigate to="/" replace />} />
+        <Route path="/admin/bookings" element={onboardingComplete ? <ManageBookings /> : <Navigate to="/" replace />} />
+        <Route path="/admin/payments" element={onboardingComplete ? <PaymentRecords /> : <Navigate to="/" replace />} />
+        <Route path="/admin/tracking" element={onboardingComplete ? <AdminTracking /> : <Navigate to="/" replace />} />
       </Routes>
 
       {showTermsModal && <TermsAcceptModal onAccept={handleTermsAccept} />}

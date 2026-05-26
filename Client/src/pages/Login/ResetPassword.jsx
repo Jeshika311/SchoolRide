@@ -4,7 +4,6 @@ import './Login.css';
 
 export default function ResetPassword() {
   const [form, setForm] = useState({ password: '', confirm: '' });
-  const [show, setShow] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -26,12 +25,12 @@ export default function ResetPassword() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <div>
             <label className="field-label">New Password</label>
-            <input name="password" value={form.password} onChange={handleChange} className="password-input" type={show ? 'text' : 'password'} placeholder="New Password" required />
+            <input name="password" value={form.password} onChange={handleChange} className="password-input" type="password" placeholder="New Password" required />
           </div>
 
           <div>
             <label className="field-label">Confirm Password</label>
-            <input name="confirm" value={form.confirm} onChange={handleChange} className="password-input" type={show ? 'text' : 'password'} placeholder="Confirm Password" required />
+            <input name="confirm" value={form.confirm} onChange={handleChange} className="password-input" type="password" placeholder="Confirm Password" required />
           </div>
 
           {error && <div className="note-error">{error}</div>}

@@ -1,29 +1,28 @@
 import { useState } from 'react';
 import './Onboarding.css';
-import bg from '../../assets/bg_splash.webp';
 import slide1 from '../../assets/img_walkthrough1.webp';
 import slide2 from '../../assets/img_walkthrough2.webp';
 import slide3 from '../../assets/img_walkthrough3.webp';
 import parentImg from '../../assets/parent.png';
 import driverImg from '../../assets/driver.png';
 import arrow from '../../assets/arrow_next_with_blue_shape.webp';
-import { FaUsers, FaBus } from 'react-icons/fa';
+import { FaUserGraduate, FaUserShield } from 'react-icons/fa';
 
 const accountCards = [
   {
-    key: 'parent',
-    title: 'Parent',
-    desc: "Book and track your child's ride",
+    key: 'student',
+    title: 'Student',
+    desc: "Book seats, make payments, and track buses live",
     image: parentImg,
-    icon: FaUsers,
+    icon: FaUserGraduate,
     iconClass: 'parent-icon',
   },
   {
-    key: 'driver',
-    title: 'Driver',
-    desc: 'Provides rides and manage trips',
+    key: 'admin',
+    title: 'Admin',
+    desc: 'Manage buses, bookings, payments, and tracking',
     image: driverImg,
-    icon: FaBus,
+    icon: FaUserShield,
     iconClass: 'driver-icon',
   },
 ];
@@ -62,23 +61,26 @@ export default function Onboarding({ onFinish }) {
         <div className="choose-screen">
           <h2 className="choose-title">Choose Your Account Type</h2>
           <div className="account-grid">
-            {accountCards.map(({ key, title, desc, image, icon: Icon, iconClass }) => (
-              <button key={key} className="account-card" onClick={() => onFinish && onFinish(key)}>
-                <div className="account-hero">
-                  <img src={image} alt={title} />
-                </div>
-                <div className="account-body-row">
-                  <div className={`account-icon ${iconClass}`} aria-hidden="true">
-                    <Icon />
+            {accountCards.map((card) => {
+              const IconComponent = card.icon;
+              return (
+                <button key={card.key} className="account-card" onClick={() => onFinish && onFinish(card.key)}>
+                  <div className="account-hero">
+                    <img src={card.image} alt={card.title} />
                   </div>
-                  <div className="account-body">
-                    <strong>{title}</strong>
-                    <small>{desc}</small>
+                  <div className="account-body-row">
+                    <div className={`account-icon ${card.iconClass}`} aria-hidden="true">
+                      <IconComponent />
+                    </div>
+                    <div className="account-body">
+                      <strong>{card.title}</strong>
+                      <small>{card.desc}</small>
+                    </div>
+                    <span className="account-chevron" aria-hidden="true">›</span>
                   </div>
-                  <span className="account-chevron" aria-hidden="true">›</span>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

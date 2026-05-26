@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import vehicleModel from '../models/vehicleModel.js';
+import DriverProfile from '../models/DriverProfile.js';
+
+// Stub DriverProfile to prevent database timeouts
+DriverProfile.findOneAndUpdate = async (filter, updates) => {
+  return {};
+};
 
 // We don't connect to real MongoDB; we'll monkeypatch save and validation
 
@@ -73,6 +79,13 @@ const mockRes = () => {
 const originalSave = vehicleModel.prototype.save;
 const originalFindByIdAndUpdate = vehicleModel.findByIdAndUpdate;
 
+vehicleModel.prototype.save = async function() {
+  const err = this.validateSync();
+  if (err) throw err;
+  lastSaved = this;
+  return this;
+};
+
 
 test('createVehicle controller returns 400 on invalid seats', async () => {
   const req = { body: { driver_id: '123', vehicle_number: 'ABC', total_seats: 2, available_seats: 5 } };
@@ -113,7 +126,7 @@ test('createVehicle controller updates driver profile seats', async () => {
   const { createVehicle } = await import('../controllers/vehicleController.js');
 
   // monkeypatch import inside controller by temporarily setting import cache
-  const req = { body: { driver_id: 'driver1', vehicle_number: 'ABC', total_seats: 10, available_seats: 10 } };
+  const req = { body: { driver_id: '60d5ec493b1a2c001f8e8e8e', vehicle_number: 'ABC', total_seats: 10, available_seats: 10 } };
   const res = mockRes();
 
   // perform createVehicle call; since controller uses dynamic import for DriverProfile it will load actual model again,
@@ -130,7 +143,7 @@ test('updateVehicle controller syncs seats on total_seats change', async () => {
   const DriverProfile = { findOneAndUpdate: async (filter, updates) => { updatedProfile = { filter, updates }; return {}; } };
 
   vehicleModel.findByIdAndUpdate = async (id, updates, opts) => {
-    const base = { driver_id: 'driver1', vehicle_number: 'ABC', total_seats: 2, available_seats: 1 };
+    const base = { driver_id: '60d5ec493b1a2c001f8e8e8e', vehicle_number: 'ABC', total_seats: 2, available_seats: 1 };
     const data = Object.assign(base, updates);
     const doc = createVehicleDoc(data);
     await doc.save();
@@ -145,6 +158,4 @@ test('updateVehicle controller syncs seats on total_seats change', async () => {
   assert.strictEqual(res.getStatus(), 200);
 });
 
-// restore originals after tests
-vehicleModel.prototype.save = originalSave;
-vehicleModel.findByIdAndUpdate = originalFindByIdAndUpdate;
+// End of tests

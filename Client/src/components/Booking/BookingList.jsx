@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useEffect, useState, useCallback } from 'react';
 import { fetchApi } from '../../api';
 import './Booking.css';
 
@@ -7,11 +8,7 @@ const BookingList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        fetchBookings();
-    }, []);
-
-    const fetchBookings = async () => {
+    const fetchBookings = useCallback(async () => {
         setLoading(true);
         // Hardcoded to parent endpoint for demo purposes, 
         // ideally checked via context or prop if role === driver
@@ -26,7 +23,11 @@ const BookingList = () => {
             setError(data.message || 'Error loading bookings');
             setBookings([]);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchBookings();
+    }, [fetchBookings]);
 
     const getStatusBadge = (status) => {
         const classes = {
