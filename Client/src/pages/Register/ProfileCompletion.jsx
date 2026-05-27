@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchApi } from '../../api';
 import './RegisterPage.css';
 
 export default function ProfileCompletion() {
-  const [userRole] = useState(() => localStorage.getItem('userRole') || 'parent');
+  const [userRole, setUserRole] = useState(() => {
+    const storedUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    return localStorage.getItem('userRole') || storedUser.role || 'student';
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
@@ -19,6 +23,26 @@ export default function ProfileCompletion() {
     years_experience: '',
   });
 
+  const normalizeVehicleType = (value) => {
+    const normalized = String(value || '').trim().toLowerCase();
+
+    if (['sedan', 'car'].includes(normalized)) return 'Car';
+    if (['suv', 'van'].includes(normalized)) return 'Van';
+    if (['minibus', 'bus'].includes(normalized)) return 'Bus';
+
+    if (['car', 'van', 'bus'].includes(normalized)) {
+      return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+    }
+
+    return '';
+  };
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+    const role = localStorage.getItem('userRole') || storedUser.role || 'student';
+    setUserRole(role);
+  }, []);
+
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
     setFormData((previous) => ({
@@ -32,25 +56,62 @@ export default function ProfileCompletion() {
     setMessage(null);
     setLoading(true);
 
-    // Store profile data in localStorage for now
-    localStorage.setItem('profileData', JSON.stringify(formData));
+    const profileData = isDriver
+      ? {
+          license_number: formData.license_number.trim(),
+          vehicle_type: normalizeVehicleType(formData.vehicle_type),
+          years_experience: formData.years_experience === '' ? '' : Number(formData.years_experience),
+        }
+      : {
+          child_name: '',
+          school_name: formData.school_name.trim(),
+          grade_class: formData.grade_class.trim(),
+        };
 
-    // Dispatch event to notify other components about school name update
-    window.dispatchEvent(new Event('schoolNameUpdated'));
-
-    // Add a small delay for better UX
-    setTimeout(() => {
+    if (isDriver && !profileData.vehicle_type) {
       setLoading(false);
-      setMessage({ type: 'success', text: 'Profile completed successfully. Redirecting to login...' });
-      
+      setMessage({ type: 'error', text: 'Please choose a valid vehicle type.' });
+      return;
+    }
+
+    try {
+      if (isDriver) {
+        const { status, data } = await fetchApi('/user/updateDriverProfile', {
+          method: 'PUT',
+          body: JSON.stringify(profileData),
+        });
+
+        if (status !== 200 || !data?.success) {
+          setLoading(false);
+          setMessage({ type: 'error', text: data?.message || 'Unable to save driver profile details.' });
+          return;
+        }
+
+        localStorage.setItem('driverProfileData', JSON.stringify(data.profile || profileData));
+      } else {
+        localStorage.setItem('profileData', JSON.stringify(profileData));
+        window.dispatchEvent(new Event('schoolNameUpdated'));
+      }
+
+      setMessage({
+        type: 'success',
+        text: isDriver
+          ? 'Driver profile completed successfully. Redirecting to your dashboard...'
+          : 'Profile completed successfully. Redirecting to your dashboard...'
+      });
+
       setTimeout(() => {
-        navigate('/login', { replace: true });
-      }, 1500);
-    }, 500);
+        setLoading(false);
+        navigate(isDriver ? '/driver/dashboard' : '/home', { replace: true });
+      }, 1200);
+    } catch (error) {
+      setLoading(false);
+      setMessage({ type: 'error', text: error?.message || 'Unable to complete profile right now.' });
+    }
   };
 
-  const isParent = userRole === 'parent';
   const isDriver = userRole === 'driver';
+  const isStudent = !isDriver;
 
   return (
     <div className="register-page">
@@ -58,7 +119,7 @@ export default function ProfileCompletion() {
         <div className="register-header">
           <h1 className="register-title">Complete Your Profile</h1>
           <p className="register-subtitle">
-            {isParent ? 'Tell us about your child' : isDriver ? 'Tell us about your driving' : 'Complete your profile'}
+            {isDriver ? 'Tell us about your driving' : 'Tell us about your school details'}
           </p>
         </div>
 
@@ -66,23 +127,10 @@ export default function ProfileCompletion() {
 
         <form className="register-form" onSubmit={handleSubmit}>
           {/* Parent-specific fields */}
-          {isParent && (
+          {isStudent && (
             <div className="form-section">
-              <h3 className="section-title">Child Information</h3>
+              <h3 className="section-title">Student Information</h3>
               
-              <div className="field-group">
-                <label className="field-label" htmlFor="child_name">Child's Name</label>
-                <input
-                  id="child_name"
-                  className="text-input"
-                  type="text"
-                  name="child_name"
-                  value={formData.child_name}
-                  onChange={handleChange}
-                  placeholder="Enter your child's name"
-                />
-              </div>
-
               <div className="field-group">
                 <label className="field-label" htmlFor="school_name">School Name</label>
                 <input
@@ -139,10 +187,9 @@ export default function ProfileCompletion() {
                   onChange={handleChange}
                 >
                   <option value="">Select vehicle type</option>
-                  <option value="sedan">Sedan</option>
-                  <option value="suv">SUV</option>
-                  <option value="van">Van</option>
-                  <option value="minibus">Minibus</option>
+                  <option value="Car">Car</option>
+                  <option value="Van">Van</option>
+                  <option value="Bus">Bus</option>
                 </select>
               </div>
 
