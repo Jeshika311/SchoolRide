@@ -32,6 +32,7 @@ export default function SidebarLayout({ children }) {
   const studentLinks = [
     { name: 'Dashboard', path: '/home', icon: FaThLarge },
     { name: 'Available Buses', path: '/buses', icon: FaBus },
+    { name: 'Ride Status', path: '/ride-status', icon: FaMapMarkerAlt },
     { name: 'Booking History', path: '/history', icon: FaHistory },
   ];
 
@@ -46,20 +47,20 @@ export default function SidebarLayout({ children }) {
   const activeLinks = role === 'admin' ? adminLinks : studentLinks;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col md:flex-row antialiased">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.12),_transparent_28%),linear-gradient(180deg,_#f8fbff_0%,_#ffffff_56%,_#eef7ff_100%)] text-slate-900 flex flex-col md:flex-row antialiased">
       {/* Mobile Top Bar */}
-      <header className="md:hidden flex items-center justify-between px-6 py-4 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+      <header className="md:hidden flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur-md border-b border-sky-100 sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-500/30">
+          <div className="p-2 bg-sky-600 rounded-xl text-white shadow-lg shadow-sky-500/20">
             <FaBus className="animate-pulse" size={20} />
           </div>
-          <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
+          <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
             SchoolRide
           </span>
         </div>
         <button 
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 text-slate-400 hover:text-white transition-colors"
+          className="p-2 text-slate-500 hover:text-sky-700 transition-colors"
         >
           {mobileOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>
@@ -67,28 +68,28 @@ export default function SidebarLayout({ children }) {
 
       {/* Sidebar Navigation */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-slate-950/90 md:bg-slate-950/40 backdrop-blur-xl border-r border-slate-800/80 p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen md:flex-shrink-0
+        fixed inset-y-0 left-0 z-40 w-64 bg-white/95 md:bg-white/90 backdrop-blur-xl border-r border-sky-100 p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen md:flex-shrink-0 shadow-[0_10px_40px_rgba(15,23,42,0.06)]
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div>
           {/* Logo */}
           <div className="hidden md:flex items-center gap-3 mb-8">
-            <div className="p-2 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-500/30">
+            <div className="p-2 bg-sky-600 rounded-xl text-white shadow-lg shadow-sky-500/20">
               <FaBus size={22} />
             </div>
-            <span className="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
+            <span className="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
               SchoolRide
             </span>
           </div>
 
           {/* Profile Quick Card */}
-          <div className="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-800/50 mb-8">
-            <div className="p-2.5 bg-slate-800 rounded-lg text-blue-400">
+          <div className="flex items-center gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100 mb-8">
+            <div className="p-2.5 bg-white rounded-lg text-sky-600 border border-sky-100">
               {role === 'admin' ? <FaUserShield size={20} /> : <FaUserGraduate size={20} />}
             </div>
             <div className="overflow-hidden">
-              <h4 className="font-semibold text-sm truncate text-slate-200">{user.name || 'User'}</h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-blue-500">{role}</span>
+              <h4 className="font-semibold text-sm truncate text-slate-900">{user.name || 'User'}</h4>
+              <span className="text-xs font-semibold uppercase tracking-wider text-sky-600">{role}</span>
             </div>
           </div>
 
@@ -105,12 +106,12 @@ export default function SidebarLayout({ children }) {
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group
                     ${isActive 
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-white'
+                      ? 'bg-sky-100 text-sky-800 shadow-sm border border-sky-200' 
+                      : 'text-slate-600 hover:bg-sky-50 hover:text-sky-700'
                     }
                   `}
                 >
-                  <Icon className={`transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-400'}`} size={18} />
+                  <Icon className={`transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-sky-700' : 'text-slate-500 group-hover:text-sky-500'}`} size={18} />
                   {link.name}
                 </Link>
               );
@@ -121,7 +122,7 @@ export default function SidebarLayout({ children }) {
         {/* Logout Section */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:bg-red-500/10 hover:text-red-400 rounded-xl text-sm font-semibold transition-all duration-200"
+          className="flex items-center gap-3 w-full px-4 py-3 text-slate-600 hover:bg-rose-50 hover:text-rose-600 rounded-xl text-sm font-semibold transition-all duration-200 border border-transparent hover:border-rose-100"
         >
           <FaSignOutAlt size={18} />
           Sign Out
@@ -129,27 +130,27 @@ export default function SidebarLayout({ children }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-h-screen md:h-screen md:overflow-y-auto bg-slate-900 flex flex-col">
+      <main className="flex-1 min-h-screen md:h-screen md:overflow-y-auto bg-transparent flex flex-col">
         {/* Top Header inside main content */}
-        <header className="hidden md:flex items-center justify-between px-8 py-5 border-b border-slate-800/80 bg-slate-950/20 backdrop-blur-sm">
+        <header className="hidden md:flex items-center justify-between px-8 py-5 border-b border-sky-100 bg-white/80 backdrop-blur-sm shadow-[0_1px_0_rgba(15,23,42,0.03)]">
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
               {location.pathname === '/home' 
                 ? `${role === 'admin' ? 'Admin Panel' : 'Student Hub'}` 
                 : location.pathname.split('/').pop().replace('-', ' ').replace(/^\w/, c => c.toUpperCase())
               }
             </h2>
-            <p className="text-xs text-slate-400">Welcome to your smart school transit dashboard</p>
+            <p className="text-xs text-slate-500">Welcome to your smart school transit dashboard</p>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs font-medium text-slate-400 bg-slate-800 px-3 py-1 rounded-full border border-slate-700/50">
+            <span className="text-xs font-medium text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
               System Live
             </span>
           </div>
         </header>
 
         {/* Content Wrapper */}
-        <div className="flex-1 p-6 md:p-8 overflow-y-auto">
+        <div className="flex-1 p-6 md:p-8 overflow-y-auto text-slate-900 text-left">
           {children}
         </div>
       </main>
