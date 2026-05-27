@@ -60,26 +60,26 @@ export default function LoginPage() {
         {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
 
         <div className="pill-toggle" role="tablist" aria-label="Login method">
-          <button className={method === 'phone' ? 'active' : ''} onClick={() => setMethod('phone')}>Phone</button>
-          <button className={method === 'email' ? 'active' : ''} onClick={() => setMethod('email')}>Email</button>
+          <button type="button" className={method === 'phone' ? 'active' : ''} onClick={() => setMethod('phone')}>Phone</button>
+          <button type="button" className={method === 'email' ? 'active' : ''} onClick={() => setMethod('email')}>Email</button>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit} autoComplete="off">
           {method === 'phone' ? (
             <div>
               <label className="field-label">Phone Number</label>
-              <input name="phone" value={form.phone} onChange={handleChange} className="text-input" placeholder="Phone Number" required />
+              <input name="phone" value={form.phone} onChange={handleChange} className="text-input" placeholder="Phone Number" autoComplete="off" required />
             </div>
           ) : (
             <div>
               <label className="field-label">Email Address</label>
-              <input name="email" value={form.email} onChange={handleChange} className="text-input" type="email" placeholder="Enter Your Email Id" required />
+              <input name="email" value={form.email} onChange={handleChange} className="text-input" type="email" placeholder="Enter Your Email Id" autoComplete="off" required />
             </div>
           )}
 
           <div>
             <label className="field-label">Password</label>
-            <input name="password" value={form.password} onChange={handleChange} className="password-input" type="password" placeholder="Password" required />
+            <input name="password" value={form.password} onChange={handleChange} className="password-input" type="password" placeholder="Password" autoComplete="off" required />
           </div>
 
           <label className="checkbox-row" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '14px', marginBottom: '14px', textAlign: 'left', cursor: 'pointer' }}>
