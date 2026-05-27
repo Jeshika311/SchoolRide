@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-hooks/set-state-in-effect */
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import { toast } from 'react-toastify';

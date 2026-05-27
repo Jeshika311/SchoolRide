@@ -6,37 +6,29 @@ import './ParentBookingHome.css';
 
 export default function ParentBookingHome() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [schoolName, setSchoolName] = useState('');
-  const [booking, setBooking] = useState({
-    from: 'Home',
-    fromAddress: '123 Raj Nagar, ABC Apartments',
-    to: 'School',
-    toName: 'St. Xavier School',
-    pickupTime: '7:30 AM',
+  const [user] = useState(() => {
+    return JSON.parse(localStorage.getItem('authUser') || 'null');
+  });
+  const [schoolName, setSchoolName] = useState(() => {
+    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+    return profileData.school_name || '';
+  });
+  const [booking, setBooking] = useState(() => {
+    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+    return {
+      from: 'Home',
+      fromAddress: '123 Raj Nagar, ABC Apartments',
+      to: 'School',
+      toName: profileData.school_name || 'St. Xavier School',
+      pickupTime: '7:30 AM',
+    };
   });
 
-  const [assignedVan, setAssignedVan] = useState({
+  const [assignedVan] = useState({
     vanNumber: 'PB65 AB 2451',
     driverName: 'Rajesh Kumar',
     vanType: 'Van',
   });
-
-  useEffect(() => {
-    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
-    setUser(authUser);
-
-    // Get school name from profile data
-    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
-    if (profileData.school_name) {
-      setSchoolName(profileData.school_name);
-      // Update booking to reflect the stored school name
-      setBooking(prev => ({
-        ...prev,
-        toName: profileData.school_name
-      }));
-    }
-  }, []);
 
   // Listen for school name changes (when selected in ProfileCompletion)
   useEffect(() => {

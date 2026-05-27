@@ -25,6 +25,10 @@ import tripRouter from './routes/tripRoutes.js';
 import NotificationRouter from './routes/notificationRoutes.js';
 import locationRouter from './routes/locationRoutes.js';
 import transportRouter from './routes/transportEventRoutes.js';
+import busRouter from './routes/busRoutes.js';
+import bookingNewRouter from './routes/bookingNewRoutes.js';
+import paymentRouter from './routes/paymentRoutes.js';
+import trackingRouter from './routes/trackingRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -75,6 +79,10 @@ app.use('/api/trips', tripRouter);
 app.use('/api/notification', NotificationRouter);
 app.use('/api/location', locationRouter);
 app.use('/api/transport-events', transportRouter);
+app.use('/api/buses', busRouter);
+app.use('/api/bookings', bookingNewRouter);
+app.use('/api/payments', paymentRouter);
+app.use('/api/tracking', trackingRouter);
 
 // general informational endpoints
 app.use('/api', infoRouter);

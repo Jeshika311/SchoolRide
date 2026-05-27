@@ -1,24 +1,35 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 
 export default function VerifyOtp() {
-  const inputs = [useRef(), useRef(), useRef(), useRef()];
+  const inputRefs = useRef([]);
   const [values, setValues] = useState(['', '', '', '']);
   const [resendTimer, setResendTimer] = useState(45);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleChange = (index, e) => {
     const val = e.target.value.slice(-1);
     const next = [...values];
     next[index] = val;
     setValues(next);
-    if (val && index < inputs.length - 1) inputs[index + 1].current.focus();
+    if (val && index < 3) {
+      inputRefs.current[index + 1]?.focus();
+    }
   };
 
   const handleVerify = (e) => {
     e.preventDefault();
     const code = values.join('');
+    console.log('Verifying OTP code:', code);
     // verify code
     navigate('/reset');
   };
@@ -31,8 +42,15 @@ export default function VerifyOtp() {
 
         <form className="auth-form" onSubmit={handleVerify}>
           <div className="otp-row">
-            {inputs.map((ref, i) => (
-              <input key={i} ref={ref} className="otp-input" maxLength={1} value={values[i]} onChange={(e) => handleChange(i, e)} />
+            {[0, 1, 2, 3].map((i) => (
+              <input 
+                key={i} 
+                ref={(el) => (inputRefs.current[i] = el)} 
+                className="otp-input" 
+                maxLength={1} 
+                value={values[i]} 
+                onChange={(e) => handleChange(i, e)} 
+              />
             ))}
           </div>
           <button className="big-btn" type="submit">Verify OTP</button>
