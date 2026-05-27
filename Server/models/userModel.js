@@ -81,6 +81,10 @@ const userSchema = new mongoose.Schema({
     type: String, 
     default: null
   },
+  isAvailable: {
+    type: Boolean,
+    default: false
+  },
   termsAccepted: {
     type: Boolean,
     default: false

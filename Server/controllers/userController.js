@@ -1,6 +1,7 @@
 import userModel from "../models/userModel.js";
 import DriverProfile from "../models/DriverProfile.js";
 import parentProfile from "../models/parentProfile.js";
+import bookingModel from "../models/bookingModel.js";
 import notificationModel from "../models/notificationModel.js";
 import SupportTicket from "../models/supportTicket.js";
 
@@ -239,6 +240,113 @@ export const updateDriverProfile = async (req, res) => {
     return res.json({ success: true, message: "Driver profile updated", profile });
   } catch (error) {
     console.error("Update Driver Profile Error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const updateDriverAvailability = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user || user.role !== 'driver') {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+
+    const { isAvailable } = req.body;
+    if (isAvailable === undefined) {
+      return res.status(400).json({ success: false, message: "Availability value is required" });
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { isAvailable: Boolean(isAvailable) },
+      { new: true }
+    ).select("-password");
+
+    return res.status(200).json({
+      success: true,
+      message: `Driver is now ${updatedUser.isAvailable ? 'online' : 'offline'}`,
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("Update Driver Availability Error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const getDriverDashboard = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const user = await userModel.findById(userId).select("-password");
+    if (!user || user.role !== 'driver') {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+
+    const [profile, bookings, notifications, unreadCount] = await Promise.all([
+      DriverProfile.findOne({ user_id: userId }),
+      bookingModel.find({ driver_id: userId })
+        .populate('parent_id', 'name email phone_number profile_photo')
+        .populate('route_id')
+        .populate('trip_id')
+        .populate('vehicle')
+        .sort({ createdAt: -1 }),
+      notificationModel.find({ user: userId }).sort({ createdAt: -1 }).limit(8),
+      notificationModel.countDocuments({ user: userId, read: false })
+    ]);
+
+    const activeBookings = bookings.filter((booking) => booking.status === 'accepted' && booking.trip_status !== 'dropped');
+    const upcomingBookings = bookings.filter((booking) => booking.status === 'pending');
+    const bookingHistory = bookings.filter((booking) => ['completed', 'rejected'].includes(booking.status));
+
+    const simplifiedBookings = (items) => items.map((booking) => ({
+      id: booking._id,
+      parentName: booking.parent_id?.name || 'Passenger',
+      parentPhone: booking.parent_id?.phone_number || booking.parent_id?.phone || '',
+      parentEmail: booking.parent_id?.email || '',
+      childName: booking.child_name,
+      pickupPoint: booking.pickup_point,
+      dropPoint: booking.drop_point,
+      route: booking.route_id,
+      trip: booking.trip_id,
+      vehicle: booking.vehicle,
+      status: booking.status,
+      tripStatus: booking.trip_status,
+      createdAt: booking.createdAt,
+      updatedAt: booking.updatedAt
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        user,
+        profile,
+        availability: Boolean(user.isAvailable),
+        stats: {
+          totalBookings: bookings.length,
+          activeBookings: activeBookings.length,
+          upcomingBookings: upcomingBookings.length,
+          historyBookings: bookingHistory.length,
+          unreadNotifications: unreadCount,
+          estimatedEarnings: bookingHistory.length * 250,
+          pendingPayout: activeBookings.length * 120
+        },
+        activeBookings: simplifiedBookings(activeBookings),
+        upcomingBookings: simplifiedBookings(upcomingBookings),
+        bookingHistory: simplifiedBookings(bookingHistory),
+        notifications,
+        recentBooking: bookings[0] ? simplifiedBookings([bookings[0]])[0] : null
+      }
+    });
+  } catch (error) {
+    console.error("Get Driver Dashboard Error:", error);
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

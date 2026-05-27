@@ -40,7 +40,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const allowedOrigins = ['http://localhost:5173']
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173'
+]
 app.use(cors({
   origin: allowedOrigins,
   credentials: true
@@ -56,7 +61,24 @@ const limiter = rateLimit({
   max: 100,
   message: "Too many requests from this IP, please try again in an hour!"
 });
-app.use('/api', limiter);
+app.use('/api', (req, res, next) => {
+  const exemptAuthRoutes = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/google-login',
+    '/auth/forgot-password',
+    '/auth/reset-password',
+    '/auth/verify-reset-otp',
+    '/auth/send-verify-otp',
+    '/auth/verify-email'
+  ];
+
+  if (exemptAuthRoutes.some((route) => req.path.startsWith(route))) {
+    return next();
+  }
+
+  return limiter(req, res, next);
+});
 
 connectDB();
 

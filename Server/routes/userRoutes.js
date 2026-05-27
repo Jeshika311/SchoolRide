@@ -6,12 +6,15 @@ import {
   updateParentProfile,
   getDriverProfile,
   updateDriverProfile,
+  updateDriverAvailability,
+  getDriverDashboard,
   changeLanguage,
   deleteAccount,
   createSupportTicket,
   getNotifications
 } from '../controllers/userController.js';
 import AuthMiddleware from '../middlewares/AuthMiddleware.js';
+import RoleMiddleware from '../middlewares/RoleMiddleware.js';
 
 const userRouter = express.Router();
 
@@ -26,6 +29,8 @@ userRouter.put('/updateParentProfile', AuthMiddleware, updateParentProfile);
 // driver-specific
 userRouter.get('/getDriverProfile', AuthMiddleware, getDriverProfile);
 userRouter.put('/updateDriverProfile', AuthMiddleware, updateDriverProfile);
+userRouter.put('/updateDriverAvailability', AuthMiddleware, RoleMiddleware('driver'), updateDriverAvailability);
+userRouter.get('/driver-dashboard', AuthMiddleware, RoleMiddleware('driver'), getDriverDashboard);
 
 // misc
 userRouter.put('/changeLanguage', AuthMiddleware, changeLanguage);

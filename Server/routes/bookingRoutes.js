@@ -22,6 +22,7 @@ bookingRouter.get('/parent', AuthMiddleware, RoleMiddleware('parent'), getParent
 
 // Route for driver to get all their bookings
 bookingRouter.get('/driver', AuthMiddleware, RoleMiddleware('driver'), getDriverBookings);
+bookingRouter.get('/driver/assigned', AuthMiddleware, RoleMiddleware('driver'), getDriverBookings);
 
 // Route to get a specific booking by ID
 bookingRouter.get('/:id', AuthMiddleware, getBookingById);
