@@ -3,26 +3,26 @@ import './Onboarding.css';
 import slide1 from '../../assets/img_walkthrough1.webp';
 import slide2 from '../../assets/img_walkthrough2.webp';
 import slide3 from '../../assets/img_walkthrough3.webp';
-import parentImg from '../../assets/parent.png';
+import studentImg from '../../assets/parent.png';
 import driverImg from '../../assets/driver.png';
 import arrow from '../../assets/arrow_next_with_blue_shape.webp';
-import { FaUserGraduate, FaUserShield } from 'react-icons/fa';
+import { FaUserGraduate, FaUserTie } from 'react-icons/fa';
 
 const accountCards = [
   {
     key: 'student',
     title: 'Student',
     desc: "Book seats, make payments, and track buses live",
-    image: parentImg,
+    image: studentImg,
     icon: FaUserGraduate,
     iconClass: 'parent-icon',
   },
   {
-    key: 'admin',
-    title: 'Admin',
-    desc: 'Manage buses, bookings, payments, and tracking',
+    key: 'driver',
+    title: 'Driver',
+    desc: 'Manage trips, updates, and live bus tracking',
     image: driverImg,
-    icon: FaUserShield,
+    icon: FaUserTie,
     iconClass: 'driver-icon',
   },
 ];
