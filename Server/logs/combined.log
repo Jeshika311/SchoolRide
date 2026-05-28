@@ -113,3 +113,7 @@
 {"level":"info","message":"Socket connected: Av225q0_CgHElr_tAAAK (User: 6a158a309e4a3568c176f866, Role: driver)","service":"schoolride-api","timestamp":"2026-05-26T11:55:36.738Z"}
 {"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-26T11:55:36.786Z"}
 {"level":"info","message":"POST /api/auth/login","service":"schoolride-api","timestamp":"2026-05-26T11:55:57.750Z"}
+{"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-05-27T18:03:40.869Z"}
+{"level":"info","message":"Socket connected: 3VfeiLBGH6HsJRfWAAAB (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-27T18:03:40.981Z"}
+{"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-05-27T18:04:14.007Z"}
+{"level":"info","message":"Socket connected: FNG9AzrIQRKZmIb7AAAB (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-27T18:04:14.074Z"}
