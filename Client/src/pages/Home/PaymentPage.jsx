@@ -159,6 +159,8 @@ export default function PaymentPage() {
     verifyTransaction(payload);
   };
 
+  const successActionButtonClass = 'w-full min-h-[3rem] flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-sky-600 bg-gradient-to-r from-sky-700 to-cyan-600 hover:from-sky-600 hover:to-cyan-500 text-white font-bold shadow-lg shadow-sky-700/20 transition-all duration-200';
+
   if (loading) {
     return (
       <SidebarLayout>
@@ -176,7 +178,7 @@ export default function PaymentPage() {
         {/* Back Link */}
         <button 
           onClick={() => navigate('/home')}
-          className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-white transition-colors"
+          className="flex items-center gap-1.5 text-sm font-semibold text-sky-700 hover:text-sky-800 transition-colors"
         >
           <FaAngleLeft size={16} />
           Back to Dashboard
@@ -190,64 +192,64 @@ export default function PaymentPage() {
 
         {/* --- PENDING PAYMENT SCREEN --- */}
         {paymentStatus === 'pending' && (
-          <div className="bg-slate-950/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-8">
+          <div className="bg-white border border-sky-100 rounded-3xl p-6 md:p-8 space-y-8 shadow-sm">
             
             {/* Invoice Header */}
-            <div className="flex justify-between items-start border-b border-slate-800/80 pb-6">
+            <div className="flex justify-between items-start border-b border-sky-100 pb-6">
               <div className="space-y-1">
-                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest block">PAYMENT INVOICE</span>
-                <h2 className="text-xl font-bold text-white">Booking Ref: #{booking?._id.toString().substring(0, 12)}</h2>
-                <p className="text-xs text-slate-400">Created on {new Date(booking?.createdAt).toLocaleDateString()}</p>
+                <span className="text-xs font-bold text-sky-600 uppercase tracking-widest block">PAYMENT INVOICE</span>
+                <h2 className="text-xl font-bold text-slate-900">Booking Ref: #{booking?._id.toString().substring(0, 12)}</h2>
+                <p className="text-xs text-slate-500">Created on {new Date(booking?.createdAt).toLocaleDateString()}</p>
               </div>
-              <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 uppercase tracking-wider">
+              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 uppercase tracking-wider">
                 Unpaid
               </span>
             </div>
 
             {/* Commute Details */}
             <div className="space-y-4">
-              <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">Ride Details</h3>
+              <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Ride Details</h3>
               <div className="grid grid-cols-2 gap-6 text-sm">
                 <div>
                   <span className="text-slate-500 block mb-0.5">BUS NUMBER</span>
-                  <span className="font-semibold text-slate-200">{booking?.busId?.busNumber}</span>
+                  <span className="font-semibold text-slate-900">{booking?.busId?.busNumber}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block mb-0.5">ROUTE ASSIGNED</span>
-                  <span className="font-semibold text-slate-200">{booking?.busId?.routeName}</span>
+                  <span className="font-semibold text-slate-900">{booking?.busId?.routeName}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block mb-0.5">PICKUP STOP</span>
-                  <span className="font-semibold text-slate-200">{booking?.pickupStop}</span>
+                  <span className="font-semibold text-slate-900">{booking?.pickupStop}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block mb-0.5">DROP STOP</span>
-                  <span className="font-semibold text-slate-200">{booking?.dropStop}</span>
+                  <span className="font-semibold text-slate-900">{booking?.dropStop}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block mb-0.5">SEAT NUMBER</span>
-                  <span className="font-extrabold text-blue-400">Seat {booking?.seatNumber}</span>
+                  <span className="font-extrabold text-sky-700">Seat {booking?.seatNumber}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block mb-0.5">STUDENT NAME</span>
-                  <span className="font-semibold text-slate-200">{booking?.studentId?.name}</span>
+                  <span className="font-semibold text-slate-900">{booking?.studentId?.name}</span>
                 </div>
               </div>
             </div>
 
             {/* Fare Summary */}
-            <div className="space-y-4 border-t border-slate-800/80 pt-6">
-              <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">Fare Summary</h3>
-              <div className="bg-slate-900/40 border border-slate-800/40 rounded-2xl p-4 space-y-3">
-                <div className="flex justify-between text-sm text-slate-300">
+            <div className="space-y-4 border-t border-sky-100 pt-6">
+              <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Fare Summary</h3>
+              <div className="bg-slate-50 border border-sky-100 rounded-2xl p-4 space-y-3 shadow-sm">
+                <div className="flex justify-between text-sm text-slate-700">
                   <span>Standard Monthly Commute Fee</span>
                   <span>₹1,500.00</span>
                 </div>
-                <div className="flex justify-between text-sm text-slate-300">
+                <div className="flex justify-between text-sm text-slate-700">
                   <span>Platform convenience fee</span>
                   <span className="text-emerald-400">FREE</span>
                 </div>
-                <div className="flex justify-between text-base font-bold text-white border-t border-slate-800/80 pt-3">
+                <div className="flex justify-between text-base font-bold text-slate-900 border-t border-sky-100 pt-3">
                   <span>Total Amount Due</span>
                   <span>₹1,500.00</span>
                 </div>
@@ -258,7 +260,7 @@ export default function PaymentPage() {
             <button
               onClick={handleCheckoutInitiate}
               disabled={checkoutLoading}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-sky-700 to-cyan-600 hover:from-sky-600 hover:to-cyan-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-sky-700/20 transition-all duration-200 flex items-center justify-center gap-2"
             >
               {checkoutLoading ? (
                 <>
@@ -278,51 +280,57 @@ export default function PaymentPage() {
 
         {/* --- SUCCESS PAYMENT SCREEN --- */}
         {paymentStatus === 'success' && (
-          <div className="bg-slate-950/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 text-center space-y-6">
+          <div className="bg-white border border-sky-100 rounded-3xl p-6 md:p-8 text-center space-y-6 shadow-sm">
             <div className="flex justify-center text-emerald-400">
               <FaCheckCircle size={70} className="animate-bounce" />
             </div>
             
             <div className="space-y-2">
-              <h2 className="text-2xl font-extrabold text-white">Commute Booked Successfully!</h2>
-              <p className="text-slate-400 text-sm max-w-md mx-auto">
+              <h2 className="text-2xl font-extrabold text-slate-900">Commute Booked Successfully!</h2>
+              <p className="text-slate-600 text-sm max-w-md mx-auto">
                 Congratulations! Your seat booking is verified. You can now board the bus using your seat coordinates.
               </p>
             </div>
 
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 text-left max-w-md mx-auto text-sm space-y-3">
-              <div className="flex justify-between text-slate-400">
-                <span>Transaction Ref</span>
-                <span className="font-mono text-slate-200">{verifiedData?.paymentId}</span>
-              </div>
-              <div className="flex justify-between text-slate-400">
-                <span>Seat Assigned</span>
-                <span className="font-extrabold text-blue-400">Seat {verifiedData?.seatNumber || booking?.seatNumber}</span>
-              </div>
-              <div className="flex justify-between text-slate-400">
-                <span>Bus Number</span>
-                <span className="font-semibold text-slate-200">{booking?.busId?.busNumber}</span>
-              </div>
-              <div className="flex justify-between text-slate-400">
-                <span>Route</span>
-                <span className="font-semibold text-slate-200">{booking?.busId?.routeName}</span>
-              </div>
-              <div className="flex justify-between text-slate-400">
-                <span>Stops Info</span>
-                <span className="font-semibold text-slate-200">{booking?.pickupStop} - {booking?.dropStop}</span>
+            <div className="bg-slate-50 border border-sky-100 rounded-2xl p-6 text-left max-w-2xl mx-auto text-sm shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-x-6 gap-y-4 text-slate-600">
+                <div className="flex items-start justify-between gap-3 sm:block">
+                  <span className="block text-slate-500">Transaction Ref</span>
+                  <span className="font-mono text-slate-900 text-right sm:text-left break-all">{verifiedData?.paymentId}</span>
+                </div>
+
+                <div className="flex items-start justify-between gap-3 sm:block">
+                  <span className="block text-slate-500">Seat Assigned</span>
+                  <span className="font-extrabold text-sky-700 text-right sm:text-left">Seat {verifiedData?.seatNumber || booking?.seatNumber}</span>
+                </div>
+
+                <div className="flex items-start justify-between gap-3 sm:block">
+                  <span className="block text-slate-500">Bus Number</span>
+                  <span className="font-semibold text-slate-900 text-right sm:text-left">{booking?.busId?.busNumber}</span>
+                </div>
+
+                <div className="sm:col-span-2 flex flex-col gap-1">
+                  <span className="text-slate-500">Route</span>
+                  <span className="font-semibold text-slate-900 leading-relaxed break-words">{booking?.busId?.routeName}</span>
+                </div>
+
+                <div className="flex items-start justify-between gap-3 sm:block sm:col-span-2">
+                  <span className="block text-slate-500">Stops Info</span>
+                  <span className="font-semibold text-slate-900 text-right sm:text-left break-words">{booking?.pickupStop} - {booking?.dropStop}</span>
+                </div>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto pt-4">
               <button 
                 onClick={() => navigate('/home')}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors"
+                className={successActionButtonClass}
               >
                 Go to Dashboard
               </button>
               <button 
                 onClick={() => window.print()}
-                className="w-full border border-slate-800 hover:bg-slate-900 text-slate-300 font-bold py-3 rounded-xl transition-colors"
+                className={successActionButtonClass}
               >
                 Print Invoice
               </button>
@@ -332,21 +340,21 @@ export default function PaymentPage() {
 
         {/* --- FAILURE PAYMENT SCREEN --- */}
         {paymentStatus === 'failed' && (
-          <div className="bg-slate-950/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 text-center space-y-6">
+          <div className="bg-white border border-sky-100 rounded-3xl p-6 md:p-8 text-center space-y-6 shadow-sm">
             <div className="flex justify-center text-rose-500">
               <FaTimesCircle size={70} />
             </div>
             
             <div className="space-y-2">
-              <h2 className="text-2xl font-extrabold text-white">Payment Failed</h2>
-              <p className="text-slate-400 text-sm max-w-md mx-auto">
+              <h2 className="text-2xl font-extrabold text-slate-900">Payment Failed</h2>
+              <p className="text-slate-600 text-sm max-w-md mx-auto">
                 Unfortunately, signature verification failed or payment was rejected. Please check your account details and try again.
               </p>
             </div>
 
             <button 
               onClick={() => setPaymentStatus('pending')}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg transition-colors"
+              className="px-6 py-3 bg-sky-700 hover:bg-sky-600 text-white font-bold rounded-xl shadow-lg shadow-sky-700/20 transition-colors"
             >
               Retry Payment
             </button>
@@ -358,50 +366,50 @@ export default function PaymentPage() {
       {/* --- MOCK SIMULATED CHECKOUT MODAL --- */}
       {checkoutModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full space-y-6 shadow-2xl">
-            <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+          <div className="bg-white border border-sky-100 rounded-3xl p-6 max-w-sm w-full space-y-6 shadow-2xl">
+            <div className="flex items-center gap-3 border-b border-sky-100 pb-4">
               <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
                 <FaCreditCard size={18} />
               </div>
               <div>
-                <h3 className="font-extrabold text-white text-sm tracking-wide">Razorpay Mock Sandbox</h3>
-                <span className="text-xs text-slate-400">Simulated test environment</span>
+                <h3 className="font-extrabold text-slate-900 text-sm tracking-wide">Razorpay Mock Sandbox</h3>
+                <span className="text-xs text-slate-500">Simulated test environment</span>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="p-3 bg-slate-950/50 rounded-xl text-xs space-y-2 text-slate-300">
+              <div className="p-3 bg-slate-50 rounded-xl text-xs space-y-2 text-slate-700 border border-sky-100">
                 <div className="flex justify-between">
                   <span>Merchant:</span>
-                  <span className="font-bold">SchoolRide Booking Ltd.</span>
+                  <span className="font-bold text-slate-900">SchoolRide Booking Ltd.</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Order Reference:</span>
-                  <span className="font-mono">{orderData?.orderId}</span>
+                  <span className="font-mono text-slate-900">{orderData?.orderId}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Amount to Pay:</span>
-                  <span className="font-bold text-white">₹1,500.00</span>
+                  <span className="font-bold text-slate-900">₹1,500.00</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <p className="text-xs text-slate-400 leading-normal">
+                <p className="text-xs text-slate-600 leading-normal">
                   This mock dashboard simulates a credit card payment check. Set status success or failure below.
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button 
                 onClick={() => handleMockPaymentVerify(true)}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition-all duration-200"
+                className="min-h-[3rem] w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-sm font-bold py-3 px-4 rounded-xl border border-emerald-600 shadow-lg shadow-emerald-600/20 transition-all duration-200"
               >
                 Simulate Success
               </button>
               <button 
                 onClick={() => handleMockPaymentVerify(false)}
-                className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-3 rounded-xl transition-all duration-200"
+                className="min-h-[3rem] w-full bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white text-sm font-bold py-3 px-4 rounded-xl border border-rose-600 shadow-lg shadow-rose-600/20 transition-all duration-200"
               >
                 Simulate Failure
               </button>
@@ -412,7 +420,7 @@ export default function PaymentPage() {
                 setCheckoutModalOpen(false);
                 setCheckoutLoading(false);
               }}
-              className="w-full text-center text-xs text-slate-500 hover:text-slate-400 py-1 transition-colors"
+              className="w-full min-h-[2.75rem] text-center text-sm font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-sky-100 rounded-xl transition-colors"
             >
               Cancel Payment
             </button>
