@@ -80,7 +80,7 @@ export default function RideStatusPage() {
           </div>
           <button
             onClick={() => navigate('/history')}
-            className="px-4 py-2 rounded-xl border border-sky-100 bg-white text-sky-700 text-sm font-semibold shadow-sm hover:bg-sky-50"
+            className="px-4 py-2 rounded-xl border border-blue-100 bg-white text-blue-700 text-sm font-semibold shadow-sm hover:bg-blue-50 transition-colors"
           >
             View Booking History
           </button>
@@ -89,13 +89,13 @@ export default function RideStatusPage() {
         {error && <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-sm">{error}</div>}
 
         {loading ? (
-          <div className="h-80 bg-white border border-sky-100 rounded-3xl shadow-sm animate-pulse" />
+          <div className="h-80 bg-white border border-slate-200 rounded-3xl shadow-sm animate-pulse" />
         ) : currentBooking ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white border border-sky-100 rounded-3xl p-6 shadow-sm space-y-6">
+            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div className="space-y-1">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-xs font-bold uppercase tracking-wider">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider">
                     <FaBus size={12} /> {currentBooking.busNumber}
                   </div>
                   <h2 className="text-xl font-extrabold text-slate-900">{currentBooking.routeName}</h2>
@@ -103,7 +103,7 @@ export default function RideStatusPage() {
                 </div>
                 <div className="text-right">
                   <div className="text-xs uppercase tracking-wider text-slate-500 font-bold">Current Status</div>
-                  <div className="mt-1 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-sm font-bold">
+                  <div className="mt-1 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-bold">
                     <FaDotCircle size={10} /> {currentBooking.status}
                   </div>
                 </div>
@@ -114,13 +114,13 @@ export default function RideStatusPage() {
                   const active = index <= currentStepIndex;
                   return (
                     <div key={step} className="flex items-center gap-4">
-                      <div className={`h-10 w-10 rounded-full border flex items-center justify-center ${active ? 'bg-sky-600 border-sky-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                      <div className={`h-10 w-10 rounded-full border flex items-center justify-center ${active ? 'bg-blue-600 border-blue-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
                         {active ? <FaCheckCircle size={16} /> : <FaClock size={16} />}
                       </div>
                       <div className="flex-1">
                         <div className={`text-sm font-bold ${active ? 'text-slate-900' : 'text-slate-500'}`}>{step}</div>
                         <div className="h-2 mt-2 rounded-full bg-slate-100 overflow-hidden">
-                          <div className={`h-full rounded-full ${active ? 'bg-sky-500 w-full' : 'bg-transparent w-0'}`} />
+                          <div className={`h-full rounded-full transition-all duration-300 ${active ? 'bg-blue-500 w-full' : 'bg-transparent w-0'}`} />
                         </div>
                       </div>
                     </div>
@@ -131,7 +131,7 @@ export default function RideStatusPage() {
               {currentBooking.status === 'Confirmed' && currentBooking.busId && (
                 <button
                   onClick={() => navigate(`/track/${currentBooking.busId}`)}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-sky-600 text-white font-bold shadow-lg shadow-sky-500/15 hover:bg-sky-500"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-all"
                 >
                   <FaMapMarkerAlt size={16} />
                   Open Live Tracking
@@ -139,9 +139,9 @@ export default function RideStatusPage() {
               )}
             </div>
 
-            <div className="bg-white border border-sky-100 rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
               <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                <FaRoute className="text-sky-600" /> Ride Summary
+                <FaRoute className="text-blue-600" /> Ride Summary
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between"><span className="text-slate-500">Booked On</span><span className="font-semibold text-slate-900">{currentBooking.createdAt ? new Date(currentBooking.createdAt).toLocaleDateString() : 'N/A'}</span></div>
@@ -152,7 +152,7 @@ export default function RideStatusPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-white border border-sky-100 border-dashed rounded-3xl p-12 text-center text-slate-500 shadow-sm">
+          <div className="bg-white border border-slate-200 border-dashed rounded-3xl p-12 text-center text-slate-550 shadow-sm">
             No current ride found. Book a bus to see ride status.
           </div>
         )}

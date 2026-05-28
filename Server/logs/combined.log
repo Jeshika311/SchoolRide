@@ -752,3 +752,133 @@
 {"level":"info","message":"Socket disconnected: twOTNwMn8vB1rmh9AAAU (User: 6a16b0b66044f7be105b0a46)","service":"schoolride-api","timestamp":"2026-05-27T08:53:51.461Z"}
 {"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-05-28T08:15:17.179Z"}
 {"level":"info","message":"Socket connected: N8Fck4h9bq-eouLwAAAB (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:15:17.224Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:16:18.994Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T08:16:19.008Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:16:19.026Z"}
+{"level":"info","message":"Socket connected: XIk8dtAU46hrlHZzAAAE (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:16:19.033Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T08:16:19.093Z"}
+{"level":"info","message":"POST /api/auth/register","service":"schoolride-api","timestamp":"2026-05-28T08:16:31.648Z"}
+{"level":"info","message":"POST /api/auth/register","service":"schoolride-api","timestamp":"2026-05-28T08:17:11.821Z"}
+{"level":"info","message":"PUT /api/user/updateDriverProfile","service":"schoolride-api","timestamp":"2026-05-28T08:17:27.919Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:29.297Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:29.451Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:40.019Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:40.151Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:44.174Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:44.327Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:45.502Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:45.637Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:47.430Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:47.585Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:48.914Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:49.063Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:52.961Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:17:53.117Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:19:52.646Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:19:52.803Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:19:55.369Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:19:55.500Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:01.641Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:01.770Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:20:03.291Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:20:03.433Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:07.507Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:07.655Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:11.088Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:11.099Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:19.420Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:19.435Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:20:21.063Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:20:21.214Z"}
+{"level":"info","message":"POST /api/auth/logout","service":"schoolride-api","timestamp":"2026-05-28T08:20:24.028Z"}
+{"level":"info","message":"POST /api/auth/login","service":"schoolride-api","timestamp":"2026-05-28T08:20:38.028Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:42.097Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:42.110Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:43.138Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:43.146Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:45.099Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:45.110Z"}
+{"level":"info","message":"Socket disconnected: N8Fck4h9bq-eouLwAAAB (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T08:20:48.479Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:50.871Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:20:50.877Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:51.807Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:20:51.815Z"}
+{"level":"info","message":"POST /api/auth/login","service":"schoolride-api","timestamp":"2026-05-28T08:21:14.852Z"}
+{"level":"info","message":"POST /api/auth/accept-terms","service":"schoolride-api","timestamp":"2026-05-28T08:21:17.424Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:21:22.301Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:21:22.447Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:21:25.848Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:21:26.001Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:21:28.794Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:21:28.913Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:21:40.196Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T08:21:40.200Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:21:40.210Z"}
+{"level":"info","message":"Socket connected: aXEgF9ZuyZeQV_YLAAAH (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:21:40.231Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T08:21:40.265Z"}
+{"level":"info","message":"Socket disconnected: aXEgF9ZuyZeQV_YLAAAH (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T08:24:03.450Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:24:03.618Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T08:24:03.622Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:24:03.627Z"}
+{"level":"info","message":"Socket connected: 9dfB8hZqD26YKlpSAAAK (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:24:03.644Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T08:24:03.700Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:24:22.788Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:24:22.922Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:24:31.480Z"}
+{"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-28T08:24:31.616Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:24:34.188Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:24:34.334Z"}
+{"level":"info","message":"GET /api/buses/6a172d52c4c0804a2df466c9","service":"schoolride-api","timestamp":"2026-05-28T08:24:38.996Z"}
+{"level":"info","message":"GET /api/buses/6a172d52c4c0804a2df466c9","service":"schoolride-api","timestamp":"2026-05-28T08:24:39.065Z"}
+{"level":"info","message":"GET /api/buses/6a172d52c4c0804a2df466c9/seats","service":"schoolride-api","timestamp":"2026-05-28T08:24:39.068Z"}
+{"level":"info","message":"GET /api/buses/6a172d52c4c0804a2df466c9/seats","service":"schoolride-api","timestamp":"2026-05-28T08:24:39.135Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:24:42.649Z"}
+{"level":"info","message":"GET /api/buses?page=1&limit=6","service":"schoolride-api","timestamp":"2026-05-28T08:24:42.773Z"}
+{"level":"info","message":"Socket disconnected: 9dfB8hZqD26YKlpSAAAK (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T08:36:04.898Z"}
+{"level":"info","message":"Socket disconnected: XIk8dtAU46hrlHZzAAAE (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T08:36:04.905Z"}
+{"level":"info","message":"Socket connected: bpm3lbCrVB3q_Q0aAAAM (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:38:11.517Z"}
+{"level":"info","message":"Socket disconnected: bpm3lbCrVB3q_Q0aAAAM (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T08:38:11.603Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:38:12.015Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:38:12.018Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T08:38:12.022Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T08:38:12.035Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T08:38:12.038Z"}
+{"level":"info","message":"Socket connected: VG1FN28zeAucdIBjAAAP (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:38:12.069Z"}
+{"level":"info","message":"Socket connected: 2eH882Bza0xsfis3AAAR (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:38:12.966Z"}
+{"level":"info","message":"Socket disconnected: 2eH882Bza0xsfis3AAAR (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T08:38:16.075Z"}
+{"level":"info","message":"Socket disconnected: VG1FN28zeAucdIBjAAAP (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T08:58:28.369Z"}
+{"level":"info","message":"Socket connected: BzzAfdHIvtv1Lk6PAAAT (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T09:14:38.638Z"}
+{"level":"info","message":"Socket disconnected: BzzAfdHIvtv1Lk6PAAAT (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T09:14:40.156Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:14:40.584Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:14:40.587Z"}
+{"level":"info","message":"Socket connected: raipDmCLF-sycgIkAAAW (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T09:14:40.617Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:14:40.621Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:14:41.413Z"}
+{"level":"info","message":"Socket disconnected: raipDmCLF-sycgIkAAAW (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T09:14:42.063Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:14:42.240Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:14:42.242Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:14:42.248Z"}
+{"level":"info","message":"Socket connected: FAiK2iQdvTzDrZyBAAAZ (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T09:14:42.267Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:14:42.318Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T09:14:43.440Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:14:43.442Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:14:43.444Z"}
+{"level":"info","message":"GET /api/user/driver-dashboard","service":"schoolride-api","timestamp":"2026-05-28T09:14:43.448Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:14:43.451Z"}
+{"level":"info","message":"Socket connected: f688vUTbrU7Mb7lvAAAc (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T09:14:43.478Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:14:43.517Z"}
+{"level":"info","message":"Socket disconnected: f688vUTbrU7Mb7lvAAAc (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T09:14:44.720Z"}
+{"level":"info","message":"Socket disconnected: FAiK2iQdvTzDrZyBAAAZ (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T09:14:46.167Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:15:12.916Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:15:12.919Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:15:12.927Z"}
+{"level":"info","message":"Socket connected: ZV603s5K3Lp73rJvAAAf (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T09:15:12.930Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:15:12.993Z"}
+{"level":"info","message":"POST /api/auth/register","service":"schoolride-api","timestamp":"2026-05-28T09:15:43.371Z"}
+{"level":"info","message":"POST /api/auth/login","service":"schoolride-api","timestamp":"2026-05-28T09:16:00.545Z"}
+{"level":"info","message":"Socket disconnected: ZV603s5K3Lp73rJvAAAf (User: 6a16f9767bedacd8505137a0)","service":"schoolride-api","timestamp":"2026-05-28T09:16:03.503Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:16:03.710Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:16:03.713Z"}
+{"level":"info","message":"GET /api/notification?limit=50","service":"schoolride-api","timestamp":"2026-05-28T09:16:03.718Z"}
+{"level":"info","message":"Socket connected: eZg-cKXsCceSwG3ZAAAi (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T09:16:03.728Z"}
+{"level":"info","message":"GET /api/notification/stats","service":"schoolride-api","timestamp":"2026-05-28T09:16:03.800Z"}

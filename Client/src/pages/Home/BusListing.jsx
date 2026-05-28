@@ -71,14 +71,14 @@ export default function BusListing() {
           
           <button 
             onClick={handleClearFilters}
-            className="text-xs font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 px-3 py-2 rounded-lg border border-sky-100 w-fit self-end md:self-auto"
+            className="text-xs font-semibold text-blue-700 hover:text-blue-800 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100 w-fit self-end md:self-auto transition-colors"
           >
             Clear All Filters
           </button>
         </div>
 
         {/* Filter Toolbar */}
-        <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-2xl border border-sky-100 shadow-sm">
+        <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
           {/* Search bar */}
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
@@ -89,7 +89,7 @@ export default function BusListing() {
               placeholder="Search bus no., stops..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-50 border border-sky-100 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-400 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
 
@@ -103,14 +103,14 @@ export default function BusListing() {
               placeholder="Filter by route name..."
               value={routeName}
               onChange={(e) => setRouteName(e.target.value)}
-              className="w-full bg-slate-50 border border-sky-100 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-400 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
 
           {/* Submit filter button */}
           <button 
             type="submit"
-            className="w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold py-2.5 rounded-xl transition-all duration-200"
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-2.5 rounded-xl shadow-sm hover:shadow transition-all duration-200"
           >
             Apply Filters
           </button>
@@ -127,7 +127,7 @@ export default function BusListing() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((n) => (
-              <div key={n} className="h-64 bg-white border border-sky-100 animate-pulse rounded-2xl shadow-sm" />
+              <div key={n} className="h-64 bg-white border border-slate-200 animate-pulse rounded-2xl shadow-sm" />
             ))}
           </div>
         ) : buses.length > 0 ? (
@@ -138,13 +138,13 @@ export default function BusListing() {
               return (
                 <div 
                   key={bus._id}
-                  className="bg-white border border-sky-100 rounded-2xl p-5 flex flex-col justify-between hover:border-sky-200 hover:shadow-md hover:scale-[1.01] transition-all duration-300 shadow-sm"
+                  className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-300 hover:shadow-md hover:scale-[1.01] transition-all duration-300 shadow-sm"
                 >
                   <div className="space-y-4">
                     {/* Bus Header */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="p-2.5 bg-sky-50 rounded-lg text-sky-600 border border-sky-100">
+                        <div className="p-2.5 bg-blue-50 rounded-lg text-blue-600 border border-blue-100">
                           <FaBus size={16} />
                         </div>
                         <span className="font-extrabold text-slate-900">{bus.busNumber}</span>
@@ -166,12 +166,12 @@ export default function BusListing() {
                     </div>
 
                     {/* Stop tags */}
-                    <div className="space-y-2 border-t border-sky-100 pt-3 text-xs">
+                    <div className="space-y-2 border-t border-slate-100 pt-3 text-xs">
                       <div>
                         <span className="text-slate-500 block mb-1">PICKUP STOPS</span>
                         <div className="flex flex-wrap gap-1">
                           {bus.pickupStops.map((stop, i) => (
-                            <span key={i} className="bg-sky-50 border border-sky-100 px-2 py-0.5 rounded text-slate-700">
+                            <span key={i} className="bg-slate-50 border border-slate-200 px-2 py-0.5 rounded text-slate-700">
                               {stop}
                             </span>
                           ))}
@@ -181,7 +181,7 @@ export default function BusListing() {
                         <span className="text-slate-500 block mb-1">DROP STOPS</span>
                         <div className="flex flex-wrap gap-1">
                           {bus.dropStops.map((stop, i) => (
-                            <span key={i} className="bg-sky-50 border border-sky-100 px-2 py-0.5 rounded text-slate-700">
+                            <span key={i} className="bg-slate-50 border border-slate-200 px-2 py-0.5 rounded text-slate-700">
                               {stop}
                             </span>
                           ))}
@@ -197,7 +197,7 @@ export default function BusListing() {
                     className={`
                       w-full mt-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200
                       ${availableCount > 0 
-                        ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-500/15' 
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/15' 
                         : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                       }
                     `}
@@ -210,7 +210,7 @@ export default function BusListing() {
             })}
           </div>
         ) : (
-          <div className="bg-white border border-sky-100 border-dashed rounded-2xl p-12 text-center text-slate-500 shadow-sm">
+          <div className="bg-white border border-slate-200 border-dashed rounded-2xl p-12 text-center text-slate-500 shadow-sm">
             No buses matching the filter criteria were found. Try modifying your search query.
           </div>
         )}
@@ -221,7 +221,7 @@ export default function BusListing() {
             <button
               onClick={() => setPage(p => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-4 py-2 border border-sky-100 rounded-xl bg-white hover:bg-sky-50 text-slate-700 disabled:opacity-40 transition-colors shadow-sm"
+              className="px-4 py-2 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 transition-colors shadow-sm"
             >
               Previous
             </button>
@@ -231,7 +231,7 @@ export default function BusListing() {
             <button
               onClick={() => setPage(p => Math.min(p + 1, pagination.pages))}
               disabled={page === pagination.pages}
-              className="px-4 py-2 border border-sky-100 rounded-xl bg-white hover:bg-sky-50 text-slate-700 disabled:opacity-40 transition-colors shadow-sm"
+              className="px-4 py-2 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 transition-colors shadow-sm"
             >
               Next
             </button>

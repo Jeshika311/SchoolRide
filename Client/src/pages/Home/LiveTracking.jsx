@@ -46,8 +46,8 @@ export default function LiveTracking() {
 
     const map = L.map(mapContainerRef.current).setView([initialLat, initialLng], 14);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20
     }).addTo(map);
 
     // Custom glowing blue marker for the bus
@@ -149,7 +149,7 @@ export default function LiveTracking() {
         {/* Back Link */}
         <button 
           onClick={() => navigate('/home')}
-          className="flex items-center gap-1.5 text-sm font-semibold text-sky-700 hover:text-sky-600 transition-colors"
+          className="flex items-center gap-1.5 text-sm font-semibold text-blue-700 hover:text-blue-600 transition-colors"
         >
           <FaAngleLeft size={16} />
           Back to Dashboard
@@ -159,14 +159,14 @@ export default function LiveTracking() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <span className="w-2.5 h-2.5 bg-sky-500 rounded-full animate-ping" />
+              <span className="w-2.5 h-2.5 bg-blue-600 rounded-full animate-ping" />
               Live Bus Tracking
             </h1>
             <p className="text-sm text-slate-500">Real-time coordinates updates from vehicle telemetry</p>
           </div>
           <button 
             onClick={pollLocation}
-            className="flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 px-3.5 py-2.5 rounded-xl border border-sky-100 transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-blue-700 hover:text-blue-800 bg-blue-50 px-3.5 py-2.5 rounded-xl border border-blue-100 transition-colors"
           >
             <FaRedo size={12} />
             Refresh
@@ -180,14 +180,14 @@ export default function LiveTracking() {
         )}
 
         {loading ? (
-          <div className="h-96 bg-white border border-sky-100 animate-pulse rounded-3xl flex items-center justify-center text-slate-500 shadow-sm">
+          <div className="h-96 bg-white border border-slate-200 animate-pulse rounded-3xl flex items-center justify-center text-slate-500 shadow-sm">
             Initializing map services...
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Map Container */}
-            <div className="md:col-span-2 bg-white p-3 rounded-3xl border border-sky-100 h-[420px] overflow-hidden relative shadow-sm">
+            <div className="md:col-span-2 bg-white p-3 rounded-3xl border border-slate-200 h-[420px] overflow-hidden relative shadow-sm">
               <div 
                 ref={mapContainerRef} 
                 className="w-full h-full rounded-2xl z-10" 
@@ -196,14 +196,14 @@ export default function LiveTracking() {
             </div>
 
             {/* Live Metrics Column */}
-            <div className="bg-white border border-sky-100 rounded-3xl p-6 flex flex-col justify-between gap-6 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between gap-6 shadow-sm">
               <div className="space-y-6">
                 <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Bus Telemetry</h3>
                 
                 <div className="space-y-4">
                   {/* Coordinates indicator */}
                   <div className="flex gap-4">
-                    <div className="p-3 bg-sky-50 rounded-xl text-sky-600 h-fit">
+                    <div className="p-3 bg-blue-50 rounded-xl text-blue-600 h-fit">
                       <FaLocationArrow size={18} />
                     </div>
                     <div>
@@ -216,7 +216,7 @@ export default function LiveTracking() {
 
                   {/* Speed indicator */}
                   <div className="flex gap-4">
-                    <div className="p-3 bg-sky-50 rounded-xl text-sky-600 h-fit">
+                    <div className="p-3 bg-blue-50 rounded-xl text-blue-600 h-fit">
                       <FaTachometerAlt size={18} />
                     </div>
                     <div>
@@ -250,7 +250,7 @@ export default function LiveTracking() {
                     w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer
                     ${sosTriggered 
                       ? 'bg-rose-600 text-white border border-rose-500 shadow-lg shadow-rose-100' 
-                      : 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white shadow-lg shadow-sky-500/20 animate-pulse'
+                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/20'
                     }
                   `}
                 >
@@ -258,14 +258,14 @@ export default function LiveTracking() {
                   {sosTriggered ? 'SOS ACTIVE - HELP NOTIFIED' : 'EMERGENCY SOS PANIC'}
                 </button>
                 {!sosTriggered && (
-                  <span className="text-[10px] text-slate-500 block text-center leading-normal">
+                  <span className="text-[10px] text-slate-550 block text-center leading-normal">
                     *Tapping will instantly ping transit authorities with current GPS telemetry
                   </span>
                 )}
               </div>
 
               {/* Status footer card */}
-              <div className="p-4 bg-sky-50 rounded-2xl border border-sky-100 text-xs text-slate-600 leading-normal space-y-1.5">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 leading-normal space-y-1.5 text-left">
                 <span className="font-bold text-slate-900 block uppercase">Real-time status</span>
                 <p>
                   Updates broadcast live via WebSockets. If the map does not refresh, coordinates fallback to periodic HTTP polling.
