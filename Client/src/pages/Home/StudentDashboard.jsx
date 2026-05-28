@@ -1,279 +1,452 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SidebarLayout from '../../components/Layout/SidebarLayout';
 import { fetchApi } from '../../api';
-import { FaBus, FaHistory, FaMapMarkerAlt, FaCreditCard, FaTicketAlt, FaChevronRight } from 'react-icons/fa';
+import { 
+  FaBus, 
+  FaSearch, 
+  FaMapMarkerAlt, 
+  FaRegBell,
+  FaArrowRight,
+  FaChevronRight,
+  FaPhoneAlt,
+  FaArrowLeft
+} from 'react-icons/fa';
+import ProfilePage from '../Profile/ProfilePage';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix Leaflet marker icon asset paths
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Tricity Coordinates Map
+const stopCoords = {
+  "Pickup Point (Home)": [30.7046, 76.7179],
+  "School Destination": [30.7390, 76.7820]
+};
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
-  const [activeBooking, setActiveBooking] = useState(null);
-  const [coRiders, setCoRiders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [pickupText, setPickupText] = useState("Sector 66, Mohali");
+  const [destinationText, setDestinationText] = useState("Sector 17, Chandigarh");
+  const [loading, setLoading] = useState(false);
+  const [selectedShuttle, setSelectedShuttle] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem('authUser') || '{}');
-  const activeBusId = activeBooking?.busId?._id || activeBooking?.busId;
-  const canTrackLiveBus = Boolean(activeBooking && activeBooking.bookingStatus === 'Confirmed' && activeBusId);
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const routeLineRef = useRef(null);
 
-  const fetchCoRiders = useCallback(async (busId) => {
-    try {
-      const { status, data } = await fetchApi(`/buses/${busId}/co-riders`);
-      if (status === 200) {
-        setCoRiders(data.data);
+  // van seating representation matching the occupied/available pattern in screenshot
+  // 1 = occupied (gold), 0 = available (grey)
+  const vanSeats = [
+    1, 1, 0, 1, 0,
+    1, 0, 1, 1, 0,
+    1, 1, 0, 0, 1
+  ];
+
+  // Leaflet Map Initialization with custom warm sepia filter
+  useEffect(() => {
+    if (!mapContainerRef.current || mapInstanceRef.current) return;
+
+    const homeCoords = stopCoords["Pickup Point (Home)"];
+    const schoolCoords = stopCoords["School Destination"];
+    const middleCoords = [30.7200, 76.7500];
+
+    const map = L.map(mapContainerRef.current, {
+      zoomControl: false,
+      attributionControl: false
+    }).setView(middleCoords, 13);
+
+    // Light tiles
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20
+    }).addTo(map);
+
+    // Custom Blue Point A Marker
+    const markerAIcon = L.divIcon({
+      className: 'custom-blue-marker-a',
+      html: `
+        <div style="width: 32px; height: 32px; background: #ffffff; border: 3px solid #2563EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #2563EB; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+          A
+        </div>
+      `,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    // Custom Green School Marker
+    const schoolIcon = L.divIcon({
+      className: 'custom-green-marker-school',
+      html: `
+        <div style="width: 32px; height: 32px; background: #10B981; border: 3px solid #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff">
+            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+            <path d="M19 12.09v3.41c0 .55-.45 1-1 1h-1v-2.09c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1V16.5H7c-.55 0-1-.45-1-1v-3.41L12 15l7-2.91z"/>
+          </svg>
+        </div>
+      `,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    // Custom shuttle/car icon
+    const carIconHtml = `
+      <div style="width: 30px; height: 18px; background: #3b82f6; border: 2px solid #fff; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); position: relative;">
+        <div style="position: absolute; left: 4px; top: -2px; width: 4px; height: 2px; background: #fff;"></div>
+        <div style="position: absolute; right: 4px; top: -2px; width: 4px; height: 2px; background: #fff;"></div>
+      </div>
+    `;
+
+    const carIcon1 = L.divIcon({ className: 'map-bus-icon-node', html: carIconHtml, iconSize: [30, 18] });
+    const carIcon2 = L.divIcon({ className: 'map-bus-icon-node', html: carIconHtml, iconSize: [30, 18] });
+    const carIcon3 = L.divIcon({ className: 'map-bus-icon-node', html: carIconHtml, iconSize: [30, 18] });
+
+    L.marker(homeCoords, { icon: markerAIcon }).addTo(map);
+    L.marker(schoolCoords, { icon: schoolIcon }).addTo(map);
+
+    // Render mock nearby shuttle markers
+    L.marker([30.7250, 76.7600], { icon: carIcon1 }).addTo(map);
+    L.marker([30.7080, 76.7300], { icon: carIcon2 }).addTo(map);
+    L.marker([30.7310, 76.7450], { icon: carIcon3 }).addTo(map);
+
+    // Thick blue active route polyline path
+    const routePolyline = L.polyline([homeCoords, schoolCoords], {
+      color: '#2563EB',
+      weight: 6,
+      opacity: 0.95,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(map);
+
+    routeLineRef.current = routePolyline;
+    mapInstanceRef.current = map;
+
+    // Center bounds
+    const bounds = L.latLngBounds([homeCoords, schoolCoords]);
+    map.fitBounds(bounds, { padding: [80, 80] });
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
       }
-    } catch (err) {
-      console.error('Error loading co-riders:', err.message);
-    }
+    };
   }, []);
 
-  const fetchActiveBooking = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { status, data } = await fetchApi('/bookings/my-bookings');
-      if (status === 200) {
-        // Active booking is the one that is Confirmed or Pending/Payment Pending
-        const active = data.data.find(b => b.bookingStatus !== 'Cancelled');
-        setActiveBooking(active || null);
-        if (active && active.bookingStatus === 'Confirmed') {
-          fetchCoRiders(active.busId?._id || active.busId);
-        }
-      } else {
-        setError(data.message || 'Failed to fetch bookings.');
-      }
-    } catch (err) {
-      setError(err.message || 'An error occurred.');
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCoRiders]);
-
-  useEffect(() => {
-    fetchActiveBooking();
-  }, [fetchActiveBooking]);
-
-  const handleCancel = async (bookingId) => {
-    if (!window.confirm('Are you sure you want to cancel this booking? This action will release your seat.')) {
-      return;
-    }
-    try {
-      const { status, data } = await fetchApi(`/bookings/${bookingId}`, {
-        method: 'DELETE'
-      });
-      if (status === 200) {
-        alert('Booking cancelled successfully.');
-        fetchActiveBooking();
-      } else {
-        alert(data.message || 'Cancellation failed.');
-      }
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
-  };
-
-  const statusColors = {
-    'Confirmed': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    'Payment Pending': 'bg-amber-50 text-amber-700 border border-amber-200',
-    'Pending': 'bg-sky-50 text-sky-700 border border-sky-200',
-    'Cancelled': 'bg-rose-50 text-rose-700 border border-rose-200'
+  const handleConfirmRide = () => {
+    // Navigate directly to buses to list rides
+    navigate('/buses');
   };
 
   return (
     <SidebarLayout>
-      <div className="max-w-6xl mx-auto space-y-8 text-slate-900">
+      <div className="absolute inset-0 w-full h-full flex flex-col md:flex-row overflow-hidden">
         
-        {/* Welcome Hero */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-sky-600 via-sky-500 to-blue-600 rounded-3xl p-6 md:p-8 shadow-xl shadow-sky-500/10 border border-sky-200">
-          <div className="relative z-10 space-y-2">
-            <h1 className="text-2xl md:text-4xl font-extrabold text-white tracking-tight">
-              Hello, {user.name || 'Student'}!
-            </h1>
-            <p className="text-blue-50 text-sm md:text-base max-w-xl font-medium">
-              Your academic journey starts here. Book, track, and manage your school commute seamlessly.
-            </p>
-            <div className="flex flex-wrap gap-3 pt-4">
-              <button
-                onClick={() => navigate('/buses')}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-sky-700 font-extrabold shadow-lg shadow-blue-950/10 hover:bg-sky-50 transition-colors"
-              >
-                <FaBus size={16} />
-                Book a Bus
-              </button>
-              <button
-                onClick={() => (canTrackLiveBus ? navigate(`/track/${activeBusId}`) : navigate('/ride-status'))}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/30 bg-white/15 text-white font-extrabold hover:bg-white/25 transition-colors"
-              >
-                <FaMapMarkerAlt size={16} />
-                {canTrackLiveBus ? 'Track Live Bus' : 'View Ride Status'}
-              </button>
-            </div>
+        {/* Full-Screen Map Container */}
+        <div className="absolute inset-0 z-0 w-full h-full">
+          <div 
+            ref={mapContainerRef} 
+            className="w-full h-full" 
+            style={{ 
+              background: '#FAF9F6'
+            }} 
+          />
+        </div>
+
+        {/* 1. FLOATING HEADER / TITLE CARD (Top Left) */}
+        <div className="absolute top-6 left-6 z-20 pointer-events-none text-left">
+          <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight drop-shadow-sm">
+            Smart Ride Booking.
+          </h2>
+          <p className="text-xs text-slate-500 font-semibold mt-0.5">
+            Live interaction of points for real-time pooling.
+          </p>
+        </div>
+
+        {/* 2. FLOATING CONTROLS & PROFILE (Top Right) */}
+        <div className="absolute top-6 right-[400px] z-20 hidden xl:flex items-center gap-3">
+          <button 
+            onClick={() => setShowProfileModal(true)}
+            className="h-10 w-10 !bg-white hover:!bg-slate-50 border border-slate-200 !text-slate-700 rounded-xl flex items-center justify-center shadow-sm transition-colors"
+            title="Profile & Settings"
+          >
+            👤
+          </button>
+          <button 
+            onClick={() => navigate('/notifications')}
+            className="h-10 w-10 !bg-white hover:!bg-slate-50 border border-slate-200 !text-slate-700 rounded-xl flex items-center justify-center shadow-sm relative transition-colors"
+          >
+            <FaRegBell size={16} />
+            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full" />
+          </button>
+        </div>
+
+        {/* 3. FLOATING SPEEDOMETER GAUGE (Bottom Center) */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 bg-white border border-slate-200 px-5 py-3 rounded-2xl flex items-center gap-4 shadow-lg">
+          <div className="text-left">
+            <span className="text-[9px] font-extrabold uppercase tracking-widest text-blue-600 block">Active Location Tracking</span>
+            <span className="text-[11px] font-bold text-slate-500 mt-0.5 block">Speed</span>
           </div>
-          <div className="absolute right-0 bottom-0 top-0 w-1/3 opacity-15 pointer-events-none flex items-center justify-center">
-            <FaBus size={150} className="text-white transform rotate-12" />
+
+          {/* Circular progress meter */}
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="16" fill="none" stroke="#E2E8F0" strokeWidth="2.5" />
+              <circle cx="18" cy="18" r="16" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeDasharray="100" strokeDashoffset="38" />
+            </svg>
+            <span className="absolute text-xs font-black text-slate-900">38</span>
           </div>
         </div>
 
-        {error && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-xl text-sm font-semibold">
-            {error}
-          </div>
-        )}
+        {/* 4. FLOATING BOOKING PANEL (Right Side - w-96) */}
+        <div className="absolute top-6 bottom-6 right-6 z-20 w-full max-w-[360px] bg-white/95 backdrop-blur-md border border-slate-200 rounded-[2rem] p-6 shadow-2xl flex flex-col justify-between overflow-y-auto hidden md:flex text-left">
+          
+          <div className="space-y-6">
+            {/* Pickup & Drop Inputs */}
+            <div className="space-y-3">
+              {/* Pickup stop input */}
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                  <FaSearch size={12} />
+                </span>
+                <input 
+                  type="text" 
+                  value={pickupText}
+                  onChange={(e) => setPickupText(e.target.value)}
+                  placeholder="Pickup Point"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-9 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
 
-        {/* Info Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-sky-100 flex items-center gap-4 shadow-sm hover:border-sky-200 transition-colors">
-            <div className="p-4 bg-sky-50 rounded-xl text-sky-600">
-              <FaTicketAlt size={22} />
+              {/* Destination stop input */}
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                  <FaSearch size={12} />
+                </span>
+                <input 
+                  type="text" 
+                  value={destinationText}
+                  onChange={(e) => setDestinationText(e.target.value)}
+                  placeholder="School Destination"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-9 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
             </div>
-            <div>
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Commute Seat</span>
-              <span className="text-lg font-bold text-slate-900 block mt-0.5">
-                {activeBooking ? `Seat #${activeBooking.seatNumber}` : 'Not Booked'}
-              </span>
-            </div>
-          </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-sky-100 flex items-center gap-4 shadow-sm hover:border-sky-200 transition-colors">
-            <div className="p-4 bg-emerald-50 rounded-xl text-emerald-600">
-              <FaCreditCard size={22} />
+            {/* Fare & ETA Card */}
+            <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl text-left space-y-1">
+              <span className="text-[9px] font-extrabold text-blue-605 uppercase tracking-wider block">Fare & ETA</span>
+              <h3 className="text-lg font-black text-blue-600">₹135 - Pool</h3>
+              <p className="text-[10px] font-bold text-slate-500">2 Seats · 2.48 min</p>
             </div>
-            <div>
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Payment Status</span>
-              <span className="text-lg font-bold text-slate-900 block mt-0.5">
-                {activeBooking ? activeBooking.bookingStatus : 'N/A'}
-              </span>
-            </div>
-          </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-sky-100 flex items-center gap-4 shadow-sm hover:border-sky-200 transition-colors">
-            <div className="p-4 bg-sky-50 rounded-xl text-sky-600">
-              <FaMapMarkerAlt size={22} />
-            </div>
-            <div>
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Ride Live Map</span>
-              <span className="text-lg font-bold text-slate-900 block mt-0.5">
-                {activeBooking && activeBooking.bookingStatus === 'Confirmed' ? 'Active' : 'Offline'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Core Booking Card Section */}
-        <div>
-          <h3 className="text-lg font-extrabold text-slate-900 tracking-tight mb-4 flex items-center gap-2">
-            Active Commute Booking
-          </h3>
-
-          {loading ? (
-            <div className="h-48 bg-white animate-pulse border border-sky-100 rounded-2xl flex items-center justify-center text-slate-500 shadow-sm">
-              Loading booking details...
-            </div>
-          ) : activeBooking ? (
-            <div className="bg-white border border-sky-100 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-sky-200 shadow-sm transition-all duration-300">
+            {/* Pooling Status Card (Visual seating visualizer of the van) */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Pooling Status</h4>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold uppercase tracking-wider text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
-                    {activeBooking.busId?.busNumber || 'Bus Detail'}
-                  </span>
-                  <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider ${statusColors[activeBooking.bookingStatus]}`}>
-                    {activeBooking.bookingStatus}
-                  </span>
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col items-center">
+                
+                {/* Visual van seats grid representation */}
+                <div className="w-full max-w-[200px] border-2 border-slate-200 bg-white/40 rounded-xl p-3 grid grid-cols-5 gap-2 relative">
+                  {/* Dashboard front indicator */}
+                  <div className="col-span-5 h-2 bg-slate-200 rounded-sm mb-1 opacity-60" />
+                  
+                  {vanSeats.map((occupied, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`h-4.5 w-full rounded-sm transition-colors border ${
+                        occupied 
+                          ? 'bg-blue-600 border-blue-700 shadow-sm shadow-blue-500/10' 
+                          : 'bg-slate-200 border-slate-300'
+                      }`}
+                    />
+                  ))}
                 </div>
 
-                <div className="space-y-1">
-                  <h4 className="text-xl font-bold text-slate-900">{activeBooking.busId?.routeName || 'Route Name'}</h4>
-                  <p className="text-slate-500 text-sm">
-                    Stops: <strong className="text-slate-700">{activeBooking.pickupStop}</strong> to <strong className="text-slate-700">{activeBooking.dropStop}</strong>
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-6 text-sm text-slate-600">
-                  <div>
-                    <span className="text-xs text-slate-500 block">SEAT ASSIGNED</span>
-                    <span className="font-extrabold text-base text-sky-700">Seat {activeBooking.seatNumber}</span>
+                {/* Seating legend */}
+                <div className="flex gap-4 mt-3 text-[10px] font-bold text-slate-500">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 bg-blue-600 rounded-sm border border-blue-700" />
+                    <span>Occupied</span>
                   </div>
-                  <div>
-                    <span className="text-xs text-slate-500 block">FARED VALUE</span>
-                    <span className="font-extrabold text-base text-slate-700">₹1,500.00 / month</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 bg-slate-200 rounded-sm border border-slate-300" />
+                    <span>Available</span>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                {activeBooking.bookingStatus === 'Payment Pending' && (
-                  <button 
-                    onClick={() => navigate(`/payment/${activeBooking._id}`)}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-700 to-cyan-600 hover:from-sky-600 hover:to-cyan-500 text-white font-semibold rounded-xl border border-sky-600 shadow-lg shadow-sky-700/20 transition-all duration-200"
-                  >
-                    <FaCreditCard size={16} />
-                    Complete Payment
-                  </button>
-                )}
+            {/* Confirm button */}
+            <button
+              onClick={handleConfirmRide}
+              className="w-full py-3.5 !bg-blue-600 hover:!bg-blue-500 !text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              Confirm Pool Ride
+            </button>
+          </div>
 
-                {activeBooking.bookingStatus === 'Confirmed' && (
-                  <button 
-                    onClick={() => navigate(`/track/${activeBusId}`)}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-sky-50 text-sky-700 font-semibold rounded-xl shadow-sm border border-sky-200 transition-all duration-200"
-                  >
-                    <FaMapMarkerAlt size={16} className="animate-bounce" />
-                    Track Live Bus
-                  </button>
-                )}
+          {/* Nearby Shuttle Network list */}
+          <div className="space-y-3 border-t border-slate-200 pt-4 mt-4">
+            <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">Nearby Shuttle Network</h4>
+            
+            <div className="space-y-2">
+              {/* Driver 1 */}
+              <div 
+                onClick={() => setSelectedShuttle({
+                  name: 'SR-POOL-11',
+                  driver: 'Rajesh Kumar',
+                  phone: '9876543210',
+                  registration: 'PB65 AB 2451',
+                  type: 'Standard 24-Seater',
+                  route: 'Sector 66 Mohali to Sector 17 Chandigarh (via Sector 62)',
+                  eta: '5 mins',
+                  occupancy: '15/24 Seats occupied',
+                  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100'
+                })}
+                className="bg-slate-50 hover:bg-slate-100 hover:border-blue-300 border border-slate-200 p-3 rounded-xl flex items-center gap-3 cursor-pointer transition-all duration-200"
+              >
+                <div className="h-8 w-8 rounded-full overflow-hidden border border-blue-500 animate-pulse">
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" className="w-full h-full object-cover" alt="driver" />
+                </div>
+                <div className="overflow-hidden flex-grow text-left">
+                  <h5 className="font-extrabold text-xs text-slate-900 text-blue-600">SR-POOL-11</h5>
+                  <p className="text-[9px] text-slate-500 leading-tight">PB65 AB 2451 · Rajesh Kumar</p>
+                </div>
+                <span className="text-[8px] font-extrabold text-blue-600 uppercase">ETA 5 MINS</span>
+              </div>
 
-                <button 
-                  onClick={() => handleCancel(activeBooking._id)}
-                  className="px-6 py-3 border border-sky-200 hover:bg-rose-50 hover:text-rose-700 text-slate-600 font-semibold rounded-xl transition-all duration-200 text-center"
+              <div 
+                onClick={() => setSelectedShuttle({
+                  name: 'SR-P-02',
+                  driver: 'Gurpreet Singh',
+                  phone: '9876500123',
+                  registration: 'PB65 XY 9988',
+                  type: 'Compact 12-Seater',
+                  route: 'Sector 67 Mohali to Sector 17 Chandigarh (via Phase 7)',
+                  eta: '9 mins',
+                  occupancy: '8/12 Seats occupied',
+                  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100'
+                })}
+                className="bg-slate-50 hover:bg-slate-100 hover:border-blue-300 border border-slate-200 p-3 rounded-xl flex items-center gap-3 cursor-pointer transition-all duration-200"
+              >
+                <div className="h-8 w-8 rounded-full overflow-hidden border border-blue-500">
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100" className="w-full h-full object-cover" alt="driver" />
+                </div>
+                <div className="overflow-hidden flex-grow text-left">
+                  <h5 className="font-extrabold text-xs text-slate-900 text-blue-600">SR-P-02</h5>
+                  <p className="text-[9px] text-slate-500 leading-tight">PB65 XY 9988 · Gurpreet Singh</p>
+                </div>
+                <span className="text-[8px] font-extrabold text-blue-600 uppercase">ETA 9 MINS</span>
+              </div>
+            </div>
+          </div>
+
+        {selectedShuttle && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedShuttle(null)}>
+            <div className="bg-white border border-slate-200 rounded-[2rem] p-6 max-w-sm w-full space-y-6 shadow-2xl relative text-left" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Close Button */}
+              <button 
+                onClick={() => setSelectedShuttle(null)} 
+                className="absolute top-4 right-4 !bg-transparent text-slate-400 hover:!text-slate-650 p-2 rounded-full hover:!bg-slate-50 transition-colors"
+              >
+                ✕
+              </button>
+
+              <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
+                <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm">
+                  <img src={selectedShuttle.avatar} className="w-full h-full object-cover" alt="driver" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">{selectedShuttle.name}</span>
+                  <h3 className="font-black text-slate-900 text-lg mt-1">{selectedShuttle.driver}</h3>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Shuttle Captain</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl text-xs space-y-3 text-slate-700">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">VAN REGISTRATION</span>
+                    <span className="font-extrabold text-slate-800 font-mono">{selectedShuttle.registration}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">SHUTTLE MODEL</span>
+                    <span className="font-bold text-slate-800">{selectedShuttle.type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">SEATING STATUS</span>
+                    <span className="font-extrabold text-blue-600">{selectedShuttle.occupancy}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">ETA TO PICKUP</span>
+                    <span className="font-extrabold text-emerald-600 uppercase">{selectedShuttle.eta}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-xs">
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] block">COMMUTE ROUTE</span>
+                  <p className="text-slate-700 leading-normal font-semibold">{selectedShuttle.route}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <a 
+                  href={`tel:${selectedShuttle.phone}`}
+                  className="min-h-[3rem] w-full !bg-blue-600 hover:!bg-blue-500 !text-white text-sm font-black rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
                 >
-                  Cancel Booking
+                  <FaPhoneAlt size={12} />
+                  Call Driver
+                </a>
+                <button 
+                  onClick={() => {
+                    setSelectedShuttle(null);
+                    navigate('/buses');
+                  }}
+                  className="min-h-[3rem] w-full border border-slate-200 !bg-white hover:!bg-slate-50 !text-slate-700 text-sm font-extrabold rounded-xl transition-all"
+                >
+                  Book Commute
                 </button>
               </div>
-
-            </div>
-          ) : (
-            <div className="bg-white border border-sky-100 border-dashed rounded-3xl p-8 text-center flex flex-col items-center justify-center gap-4 shadow-sm">
-              <div className="p-4 bg-sky-50 rounded-2xl text-sky-500">
-                <FaBus size={40} />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-bold text-lg text-slate-900">No commute booked yet</h4>
-                <p className="text-slate-500 text-sm max-w-sm">
-                  You don't have any active transportation booking. Book your bus seat to guarantee your ride to school!
-                </p>
-              </div>
-              <Link 
-                to="/buses"
-                className="flex items-center gap-2 px-6 py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-200 group mt-2"
-              >
-                Book a Bus Seat
-                <FaChevronRight className="transition-transform group-hover:translate-x-1" size={12} />
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Co-Riders Section */}
-        {activeBooking && activeBooking.bookingStatus === 'Confirmed' && coRiders.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              Fellow Co-Riders on Bus
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {coRiders.map((rider, i) => (
-                <div key={i} className="bg-white border border-sky-100 rounded-2xl p-4 flex items-center gap-3 hover:border-sky-200 shadow-sm transition-colors">
-                  <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-sky-600 to-blue-600 flex items-center justify-center font-bold text-white text-xs shadow-md">
-                    {rider.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
-                  </div>
-                  <div className="overflow-hidden">
-                    <span className="font-bold text-sm text-slate-900 block truncate">{rider.name}</span>
-                    <span className="text-xs text-sky-600 font-bold uppercase block mt-0.5">Seat #{rider.seatNumber}</span>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         )}
-        
+
+        {showProfileModal && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowProfileModal(false)}>
+            <div className="bg-white border border-slate-200 rounded-[2rem] p-6 max-w-md w-full shadow-2xl relative text-left flex flex-col max-h-[85vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Header with Back Button */}
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-4">
+                <button 
+                  onClick={() => setShowProfileModal(false)}
+                  className="h-10 w-10 !bg-white hover:!bg-slate-50 border border-slate-200 !text-slate-700 rounded-xl flex items-center justify-center shadow-sm transition-all"
+                  title="Back to Dashboard"
+                >
+                  <FaArrowLeft size={14} />
+                </button>
+                <div>
+                  <h3 className="font-black text-slate-900 text-lg">Profile Details</h3>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Manage your account & settings</span>
+                </div>
+              </div>
+
+              {/* Scrollable content containing ProfilePage */}
+              <div className="overflow-y-auto flex-1 pr-1 scrollbar-thin">
+                <ProfilePage isPopup={true} onClose={() => setShowProfileModal(false)} />
+              </div>
+            </div>
+          </div>
+        )}
+        </div>
+
       </div>
     </SidebarLayout>
   );

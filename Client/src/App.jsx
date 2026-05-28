@@ -57,7 +57,7 @@ function HomeRoute() {
     return <DriverDashboard />;
   }
   if (role === 'student') {
-    return <ParentBookingHome />;
+    return <StudentDashboard />;
   }
   if (role === 'admin') {
     return <AdminDashboard />;

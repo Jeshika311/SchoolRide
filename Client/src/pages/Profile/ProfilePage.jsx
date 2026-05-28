@@ -4,7 +4,7 @@ import { fetchApi } from '../../api';
 import { FiLogOut } from 'react-icons/fi';
 import './ProfilePage.css';
 
-export default function ProfilePage() {
+export default function ProfilePage({ isPopup = false, onClose }) {
   const navigate = useNavigate();
   const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
   const [showSettings, setShowSettings] = useState(false);
@@ -57,7 +57,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="profile-shell">
+    <div className={`profile-shell ${isPopup ? 'is-popup' : ''}`}>
       <div className="profile-header">
         <div className="profile-avatar">{authUser.name ? authUser.name.charAt(0) : 'U'}</div>
         <div className="profile-info">
@@ -69,7 +69,13 @@ export default function ProfilePage() {
       <div className="profile-menu">
         {!showSettings ? (
           <>
-            <button className="menu-item" onClick={() => handleNavigate('/home')}>
+            <button className="menu-item" onClick={() => {
+              if (isPopup && onClose) {
+                onClose();
+              } else {
+                handleNavigate('/home');
+              }
+            }}>
               <span className="menu-icon">🏠</span>
               <span className="menu-label">Dashboard</span>
             </button>
