@@ -54,7 +54,7 @@ export default function BookingHistory() {
     'Cancelled': 'bg-rose-50 text-rose-700 border border-rose-200',
     'Accepted': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
     'Rejected': 'bg-rose-50 text-rose-700 border border-rose-200',
-    'Completed': 'bg-slate-100 text-slate-655 border border-slate-200'
+    'Completed': 'bg-slate-100 text-slate-600 border border-slate-200'
   };
 
   const liveStatuses = new Set(['Confirmed', 'Accepted']);
@@ -116,7 +116,7 @@ export default function BookingHistory() {
             <div className="text-3xl font-black text-blue-600 mt-1">{upcomingBookings.length}</div>
           </div>
           <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm text-left">
-            <div className="text-xs uppercase tracking-wider text-slate-500 font-extrabold">Previous Bookings</div>
+            <div className="text-xs uppercase tracking-wider text-slate-505 font-extrabold">Previous Bookings</div>
             <div className="text-3xl font-black text-blue-600 mt-1">{previousBookings.length}</div>
           </div>
         </div>
@@ -149,6 +149,7 @@ export default function BookingHistory() {
                     onClick={() => booking.busId && navigate(`/track/${booking.busId}`)}
                     className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-blue-700 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
                   >
+                    <FaCreditCard size={12} />
                     View Ride Status
                     <FaAngleRight size={12} />
                   </button>
@@ -160,7 +161,7 @@ export default function BookingHistory() {
             <section className={sectionCardClass}>
               <div className="text-left mb-4">
                 <h2 className="text-lg font-extrabold text-slate-900">Upcoming Bookings</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Bookings waiting for payment or confirmation.</p>
+                <p className="text-xs text-slate-505 mt-0.5">Bookings waiting for payment or confirmation.</p>
               </div>
               <div className="space-y-4">
                 {upcomingBookings.length > 0 ? upcomingBookings.map((booking) => renderBookingCard(

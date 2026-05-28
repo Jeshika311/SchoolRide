@@ -197,7 +197,7 @@ export default function PaymentPage() {
               <div className="space-y-1">
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block">PAYMENT INVOICE</span>
                 <h2 className="text-xl font-bold text-slate-900">Booking Ref: #{booking?._id.toString().substring(0, 12)}</h2>
-                <p className="text-xs text-slate-500 font-medium">Created on {new Date(booking?.createdAt).toLocaleDateString()}</p>
+                <p className="text-xs text-slate-505 font-medium">Created on {new Date(booking?.createdAt).toLocaleDateString()}</p>
               </div>
               <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 uppercase tracking-wider">
                 Unpaid
@@ -290,7 +290,7 @@ export default function PaymentPage() {
               </p>
             </div>
 
-            <div className="bg-slate-50 border border-slate-250 rounded-2xl p-6 text-left max-w-md mx-auto text-sm space-y-3">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-left max-w-md mx-auto text-sm space-y-3">
               <div className="flex justify-between text-slate-500">
                 <span>Transaction Ref</span>
                 <span className="font-mono text-slate-800 font-bold">{verifiedData?.paymentId}</span>
@@ -339,14 +339,14 @@ export default function PaymentPage() {
             
             <div className="space-y-2">
               <h2 className="text-2xl font-extrabold text-slate-900">Payment Failed</h2>
-              <p className="text-slate-550 text-sm max-w-md mx-auto">
+              <p className="text-slate-555 text-sm max-w-md mx-auto">
                 Unfortunately, signature verification failed or payment was rejected. Please check your account details and try again.
               </p>
             </div>
 
             <button 
               onClick={() => setPaymentStatus('pending')}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg transition-colors"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-colors"
             >
               Retry Payment
             </button>
@@ -370,7 +370,7 @@ export default function PaymentPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs space-y-2 text-slate-600 text-left">
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs space-y-2 text-slate-655 text-left">
                 <div className="flex justify-between">
                   <span>Merchant:</span>
                   <span className="font-bold text-slate-800">SchoolRide Booking Ltd.</span>
@@ -381,7 +381,7 @@ export default function PaymentPage() {
                 </div>
                 <div className="flex justify-between">
                   <span>Amount to Pay:</span>
-                  <span className="font-bold text-slate-900">₹1,500.00</span>
+                  <span className="font-bold text-slate-905 font-extrabold">₹1,500.00</span>
                 </div>
               </div>
 
@@ -392,16 +392,16 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button 
                 onClick={() => handleMockPaymentVerify(true)}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition-all duration-200"
+                className="min-h-[3rem] w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-sm font-bold py-3 px-4 rounded-xl border border-emerald-600 shadow-lg shadow-emerald-600/20 transition-all duration-200"
               >
                 Simulate Success
               </button>
               <button 
                 onClick={() => handleMockPaymentVerify(false)}
-                className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-3 rounded-xl transition-all duration-200"
+                className="min-h-[3rem] w-full bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white text-sm font-bold py-3 px-4 rounded-xl border border-rose-600 shadow-lg shadow-rose-600/20 transition-all duration-200"
               >
                 Simulate Failure
               </button>
@@ -412,7 +412,7 @@ export default function PaymentPage() {
                 setCheckoutModalOpen(false);
                 setCheckoutLoading(false);
               }}
-              className="w-full text-center text-xs text-slate-450 hover:text-slate-650 py-1 transition-colors"
+              className="w-full text-center text-xs text-slate-500 hover:text-slate-700 py-1 transition-colors"
             >
               Cancel Payment
             </button>

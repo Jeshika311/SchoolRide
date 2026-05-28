@@ -148,22 +148,22 @@ export default function SeatSelection() {
             <div className="flex gap-6 mb-8 text-xs font-semibold">
               <div className="flex items-center gap-1.5">
                 <span className="w-4 h-4 bg-emerald-50 border border-emerald-200 rounded-md" />
-                <span className="text-slate-505">Available</span>
+                <span className="text-slate-500">Available</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-4 h-4 bg-rose-50 border border-rose-200 rounded-md" />
-                <span className="text-slate-505">Occupied</span>
+                <span className="text-slate-500">Occupied</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-4 h-4 bg-blue-600 rounded-md" />
-                <span className="text-slate-505">Selected</span>
+                <span className="text-slate-550">Selected</span>
               </div>
             </div>
 
             {/* Simulated Driver Position */}
             <div className="w-full max-w-[280px] bg-slate-50 border border-slate-200 p-3 rounded-xl text-center mb-6 flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">DRIVE STEERING</span>
-              <span className="w-8 h-8 rounded-full border-4 border-slate-350 border-t-blue-600 animate-spin" />
+              <span className="w-8 h-8 rounded-full border-4 border-slate-300 border-t-blue-600 animate-spin" />
             </div>
 
             {/* Seats Grid */}
@@ -172,7 +172,7 @@ export default function SeatSelection() {
                 const isSelected = seat.seatNumber === selectedSeat;
                 let bgClass = 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700 cursor-pointer';
                 if (seat.isOccupied) {
-                  bgClass = 'bg-rose-50 border-rose-100 text-rose-350 cursor-not-allowed';
+                  bgClass = 'bg-rose-50 border-rose-100 text-rose-300 cursor-not-allowed';
                 } else if (isSelected) {
                   bgClass = 'bg-blue-600 border-blue-700 text-white shadow-lg shadow-blue-500/20 cursor-pointer';
                 }
@@ -201,7 +201,7 @@ export default function SeatSelection() {
               
               {/* Pickup stop dropdown */}
               <div>
-                <label className="text-xs font-bold text-slate-550 block mb-2">PICKUP STOPS</label>
+                <label className="text-xs font-bold text-slate-500 block mb-2">PICKUP STOPS</label>
                 <select
                   value={pickupStop}
                   onChange={(e) => setPickupStop(e.target.value)}
@@ -217,7 +217,7 @@ export default function SeatSelection() {
 
               {/* Drop stop dropdown */}
               <div>
-                <label className="text-xs font-bold text-slate-550 block mb-2">DROP STOPS</label>
+                <label className="text-xs font-bold text-slate-500 block mb-2">DROP STOPS</label>
                 <select
                   value={dropStop}
                   onChange={(e) => setDropStop(e.target.value)}
@@ -233,7 +233,7 @@ export default function SeatSelection() {
 
               {/* Seat indicator summary */}
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-sm">
-                <span className="text-slate-500 font-medium">Selected Seat</span>
+                <span className="text-slate-550 font-medium">Selected Seat</span>
                 <span className="font-extrabold text-blue-600 text-lg">
                   {selectedSeat ? `Seat #${selectedSeat}` : 'None Chosen'}
                 </span>

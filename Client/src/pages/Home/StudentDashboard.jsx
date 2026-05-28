@@ -8,8 +8,11 @@ import {
   FaMapMarkerAlt, 
   FaRegBell,
   FaArrowRight,
-  FaChevronRight
+  FaChevronRight,
+  FaPhoneAlt,
+  FaArrowLeft
 } from 'react-icons/fa';
+import ProfilePage from '../Profile/ProfilePage';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -32,6 +35,8 @@ export default function StudentDashboard() {
   const [pickupText, setPickupText] = useState("Sector 66, Mohali");
   const [destinationText, setDestinationText] = useState("Sector 17, Chandigarh");
   const [loading, setLoading] = useState(false);
+  const [selectedShuttle, setSelectedShuttle] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -166,10 +171,17 @@ export default function StudentDashboard() {
 
         {/* 2. FLOATING CONTROLS & PROFILE (Top Right) */}
         <div className="absolute top-6 right-[400px] z-20 hidden xl:flex items-center gap-3">
-          <button className="h-10 w-10 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl flex items-center justify-center shadow-sm transition-colors">
+          <button 
+            onClick={() => setShowProfileModal(true)}
+            className="h-10 w-10 !bg-white hover:!bg-slate-50 border border-slate-200 !text-slate-700 rounded-xl flex items-center justify-center shadow-sm transition-colors"
+            title="Profile & Settings"
+          >
             👤
           </button>
-          <button className="h-10 w-10 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl flex items-center justify-center shadow-sm relative transition-colors">
+          <button 
+            onClick={() => navigate('/notifications')}
+            className="h-10 w-10 !bg-white hover:!bg-slate-50 border border-slate-200 !text-slate-700 rounded-xl flex items-center justify-center shadow-sm relative transition-colors"
+          >
             <FaRegBell size={16} />
             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full" />
           </button>
@@ -274,7 +286,7 @@ export default function StudentDashboard() {
             {/* Confirm button */}
             <button
               onClick={handleConfirmRide}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3.5 !bg-blue-600 hover:!bg-blue-500 !text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
             >
               Confirm Pool Ride
             </button>
@@ -286,31 +298,153 @@ export default function StudentDashboard() {
             
             <div className="space-y-2">
               {/* Driver 1 */}
-              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full overflow-hidden border border-blue-500">
+              <div 
+                onClick={() => setSelectedShuttle({
+                  name: 'SR-POOL-11',
+                  driver: 'Rajesh Kumar',
+                  phone: '9876543210',
+                  registration: 'PB65 AB 2451',
+                  type: 'Standard 24-Seater',
+                  route: 'Sector 66 Mohali to Sector 17 Chandigarh (via Sector 62)',
+                  eta: '5 mins',
+                  occupancy: '15/24 Seats occupied',
+                  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100'
+                })}
+                className="bg-slate-50 hover:bg-slate-100 hover:border-blue-300 border border-slate-200 p-3 rounded-xl flex items-center gap-3 cursor-pointer transition-all duration-200"
+              >
+                <div className="h-8 w-8 rounded-full overflow-hidden border border-blue-500 animate-pulse">
                   <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" className="w-full h-full object-cover" alt="driver" />
                 </div>
                 <div className="overflow-hidden flex-grow text-left">
-                  <h5 className="font-extrabold text-xs text-slate-900">SR-POOL-11</h5>
-                  <p className="text-[9px] text-slate-500 leading-tight">Seats, 1 Model. School</p>
+                  <h5 className="font-extrabold text-xs text-slate-900 text-blue-600">SR-POOL-11</h5>
+                  <p className="text-[9px] text-slate-500 leading-tight">PB65 AB 2451 · Rajesh Kumar</p>
                 </div>
-                <span className="text-[8px] font-extrabold text-blue-600 uppercase">ETA to pick up</span>
+                <span className="text-[8px] font-extrabold text-blue-600 uppercase">ETA 5 MINS</span>
               </div>
 
-              {/* Driver 2 */}
-              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-3">
+              <div 
+                onClick={() => setSelectedShuttle({
+                  name: 'SR-P-02',
+                  driver: 'Gurpreet Singh',
+                  phone: '9876500123',
+                  registration: 'PB65 XY 9988',
+                  type: 'Compact 12-Seater',
+                  route: 'Sector 67 Mohali to Sector 17 Chandigarh (via Phase 7)',
+                  eta: '9 mins',
+                  occupancy: '8/12 Seats occupied',
+                  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100'
+                })}
+                className="bg-slate-50 hover:bg-slate-100 hover:border-blue-300 border border-slate-200 p-3 rounded-xl flex items-center gap-3 cursor-pointer transition-all duration-200"
+              >
                 <div className="h-8 w-8 rounded-full overflow-hidden border border-blue-500">
                   <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100" className="w-full h-full object-cover" alt="driver" />
                 </div>
                 <div className="overflow-hidden flex-grow text-left">
-                  <h5 className="font-extrabold text-xs text-slate-900">SR-P-02</h5>
-                  <p className="text-[9px] text-slate-500 leading-tight">Seats, 1 Model. SI P 02</p>
+                  <h5 className="font-extrabold text-xs text-slate-900 text-blue-600">SR-P-02</h5>
+                  <p className="text-[9px] text-slate-500 leading-tight">PB65 XY 9988 · Gurpreet Singh</p>
                 </div>
-                <span className="text-[8px] font-extrabold text-blue-600 uppercase">ETA to pick up</span>
+                <span className="text-[8px] font-extrabold text-blue-600 uppercase">ETA 9 MINS</span>
               </div>
             </div>
           </div>
 
+        {selectedShuttle && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedShuttle(null)}>
+            <div className="bg-white border border-slate-200 rounded-[2rem] p-6 max-w-sm w-full space-y-6 shadow-2xl relative text-left" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Close Button */}
+              <button 
+                onClick={() => setSelectedShuttle(null)} 
+                className="absolute top-4 right-4 !bg-transparent text-slate-400 hover:!text-slate-650 p-2 rounded-full hover:!bg-slate-50 transition-colors"
+              >
+                ✕
+              </button>
+
+              <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
+                <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm">
+                  <img src={selectedShuttle.avatar} className="w-full h-full object-cover" alt="driver" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">{selectedShuttle.name}</span>
+                  <h3 className="font-black text-slate-900 text-lg mt-1">{selectedShuttle.driver}</h3>
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Shuttle Captain</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl text-xs space-y-3 text-slate-700">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">VAN REGISTRATION</span>
+                    <span className="font-extrabold text-slate-800 font-mono">{selectedShuttle.registration}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">SHUTTLE MODEL</span>
+                    <span className="font-bold text-slate-800">{selectedShuttle.type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">SEATING STATUS</span>
+                    <span className="font-extrabold text-blue-600">{selectedShuttle.occupancy}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">ETA TO PICKUP</span>
+                    <span className="font-extrabold text-emerald-600 uppercase">{selectedShuttle.eta}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-xs">
+                  <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] block">COMMUTE ROUTE</span>
+                  <p className="text-slate-700 leading-normal font-semibold">{selectedShuttle.route}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <a 
+                  href={`tel:${selectedShuttle.phone}`}
+                  className="min-h-[3rem] w-full !bg-blue-600 hover:!bg-blue-500 !text-white text-sm font-black rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+                >
+                  <FaPhoneAlt size={12} />
+                  Call Driver
+                </a>
+                <button 
+                  onClick={() => {
+                    setSelectedShuttle(null);
+                    navigate('/buses');
+                  }}
+                  className="min-h-[3rem] w-full border border-slate-200 !bg-white hover:!bg-slate-50 !text-slate-700 text-sm font-extrabold rounded-xl transition-all"
+                >
+                  Book Commute
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showProfileModal && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowProfileModal(false)}>
+            <div className="bg-white border border-slate-200 rounded-[2rem] p-6 max-w-md w-full shadow-2xl relative text-left flex flex-col max-h-[85vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Header with Back Button */}
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-4">
+                <button 
+                  onClick={() => setShowProfileModal(false)}
+                  className="h-10 w-10 !bg-white hover:!bg-slate-50 border border-slate-200 !text-slate-700 rounded-xl flex items-center justify-center shadow-sm transition-all"
+                  title="Back to Dashboard"
+                >
+                  <FaArrowLeft size={14} />
+                </button>
+                <div>
+                  <h3 className="font-black text-slate-900 text-lg">Profile Details</h3>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Manage your account & settings</span>
+                </div>
+              </div>
+
+              {/* Scrollable content containing ProfilePage */}
+              <div className="overflow-y-auto flex-1 pr-1 scrollbar-thin">
+                <ProfilePage isPopup={true} onClose={() => setShowProfileModal(false)} />
+              </div>
+            </div>
+          </div>
+        )}
         </div>
 
       </div>

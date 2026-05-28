@@ -159,7 +159,7 @@ export default function BusListing() {
                     {/* Route Details */}
                     <div>
                       <h4 className="font-bold text-lg text-slate-900">{bus.routeName}</h4>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+                      <div className="flex items-center gap-2 text-xs text-slate-505 mt-1">
                         <FaUsers size={12} />
                         <span>Total seats: {bus.totalSeats}</span>
                       </div>
@@ -195,14 +195,15 @@ export default function BusListing() {
                     onClick={() => navigate(`/seat-selection/${bus._id}`)}
                     disabled={availableCount <= 0}
                     className={`
-                      w-full mt-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200
+                      w-full mt-6 min-h-[3.5rem] px-4 rounded-xl font-bold text-base leading-none flex items-center justify-center gap-2 transition-all duration-200
+                      disabled:opacity-100
                       ${availableCount > 0 
                         ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/15' 
                         : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                       }
                     `}
                   >
-                    Select Seat & stops
+                    Select Seat & Stops
                     <FaArrowRight size={12} />
                   </button>
                 </div>

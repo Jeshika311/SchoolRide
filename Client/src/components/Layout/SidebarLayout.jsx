@@ -92,18 +92,20 @@ export default function SidebarLayout({ children }) {
             </span>
           </div>
 
-          {/* Profile Quick Card - Aria Student & Parent Monitor */}
+          {/* Profile Quick Card - Logged in user details */}
           <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-8">
             <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-blue-500 bg-slate-100">
               <img 
                 src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100" 
-                alt="Aria" 
+                alt={user?.name || 'User'} 
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="overflow-hidden text-left">
-              <h4 className="font-bold text-sm truncate text-slate-900">Aria - Student</h4>
-              <span className="text-[9px] font-extrabold uppercase tracking-widest text-blue-600 block mt-0.5">PARENT MONITOR</span>
+              <h4 className="font-bold text-sm truncate text-slate-900">{user?.name || 'Aria'}</h4>
+              <span className="text-[9px] font-extrabold uppercase tracking-widest text-blue-600 block mt-0.5">
+                {role === 'parent' ? 'PARENT MONITOR' : 'STUDENT'}
+              </span>
             </div>
           </div>
 
@@ -111,7 +113,7 @@ export default function SidebarLayout({ children }) {
           <nav className="space-y-1">
             {displayLinks.map((link) => {
               const Icon = link.icon;
-              const isActive = location.pathname === link.path;
+              const isActive = location.pathname === link.path && (link.name !== 'Wallet' || location.pathname === '/wallet');
               return (
                 <Link
                   key={link.name}
@@ -120,12 +122,12 @@ export default function SidebarLayout({ children }) {
                   className={`
                     flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group
                     ${isActive 
-                      ? 'bg-blue-600 text-white border-none shadow-md shadow-blue-500/20' 
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                      ? 'bg-blue-600 !text-white border-none shadow-md shadow-blue-500/20' 
+                      : '!text-slate-600 hover:!text-slate-900 border border-transparent'
                     }
                   `}
                 >
-                  <Icon className={`transition-transform duration-200 group-hover:scale-105 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-800'}`} size={16} />
+                  <Icon className={`transition-transform duration-200 group-hover:scale-105 ${isActive ? '!text-white' : '!text-slate-500 group-hover:!text-slate-800'}`} size={16} />
                   {link.name}
                 </Link>
               );
@@ -136,7 +138,7 @@ export default function SidebarLayout({ children }) {
         {/* Logout Section */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl text-sm font-bold transition-all duration-200"
+          className="flex items-center gap-3 w-full px-4 py-3 !text-slate-600 hover:!text-slate-900 rounded-xl text-sm font-bold transition-all duration-200"
         >
           <FaSignOutAlt size={18} />
           Sign Out
