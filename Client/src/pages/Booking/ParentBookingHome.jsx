@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfilePage from '../Profile/ProfilePage';
 import NotificationBell from '../../components/Notification/NotificationBell';
+import { fetchApi } from '../../api';
 import './ParentBookingHome.css';
 
 export default function ParentBookingHome() {
@@ -9,26 +10,117 @@ export default function ParentBookingHome() {
   const [user] = useState(() => {
     return JSON.parse(localStorage.getItem('authUser') || 'null');
   });
+  const storedProfileData = JSON.parse(localStorage.getItem('profileData') || '{}');
   const [schoolName, setSchoolName] = useState(() => {
-    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
-    return profileData.school_name || '';
+    return storedProfileData.school_name || '';
   });
   const [booking, setBooking] = useState(() => {
-    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
     return {
-      from: 'Home',
-      fromAddress: '123 Raj Nagar, ABC Apartments',
-      to: 'School',
-      toName: profileData.school_name || 'St. Xavier School',
-      pickupTime: '7:30 AM',
+      from: 'Source',
+      fromAddress: storedProfileData.pickup_address || 'Add your pickup address in profile',
+      to: 'Destination',
+      toName: storedProfileData.drop_address || storedProfileData.school_name || 'School destination',
+      pickupTime: 'Assigned after booking',
     };
   });
 
-  const [assignedVan] = useState({
-    vanNumber: 'PB65 AB 2451',
-    driverName: 'Rajesh Kumar',
+  const [assignedVan, setAssignedVan] = useState({
+    vanNumber: 'Pending booking',
+    driverName: 'Assigned after booking',
     vanType: 'Van',
   });
+
+  const normalizeText = (value = '') => value.toString().toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+  const findMatchingRoute = (routes = [], busRouteName = '', pickupStop = '', dropStop = '', pickupAddress = '', dropAddress = '') => {
+    const normalizedBusRoute = normalizeText(busRouteName);
+    const normalizedPickup = normalizeText(pickupStop || pickupAddress);
+    const normalizedDrop = normalizeText(dropStop || dropAddress);
+
+    return routes.find((route) => {
+      const routeStart = normalizeText(route.start_location);
+      const routeEnd = normalizeText(route.end_location);
+      const routeStops = normalizeText(Array.isArray(route.stops) ? route.stops.join(' ') : '');
+
+      const directMatch = normalizedBusRoute && routeStart && routeEnd
+        && normalizedBusRoute.includes(routeStart)
+        && normalizedBusRoute.includes(routeEnd);
+
+      const pickupDropMatch = normalizedPickup && normalizedDrop
+        && routeStart.includes(normalizedPickup)
+        && routeEnd.includes(normalizedDrop);
+
+      const stopMatch = routeStops
+        && normalizedPickup
+        && normalizedDrop
+        && routeStops.includes(normalizedPickup)
+        && routeStops.includes(normalizedDrop);
+
+      return directMatch || pickupDropMatch || stopMatch;
+    });
+  };
+
+  useEffect(() => {
+    const loadRideDetails = async () => {
+      try {
+        const latestProfileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+        const [bookingsRes, routesRes] = await Promise.all([
+          fetchApi('/bookings/my-bookings'),
+          fetchApi('/routes')
+        ]);
+
+        const bookings = bookingsRes.status === 200 ? (bookingsRes.data.data || []) : [];
+        const currentBooking = bookings.find((item) => item.bookingStatus !== 'Cancelled') || bookings[0] || null;
+        const routes = routesRes.status === 200 ? (routesRes.data.data || []) : [];
+
+        if (!currentBooking) {
+          return;
+        }
+
+        const bookingBus = currentBooking.busId || {};
+        const matchedRoute = findMatchingRoute(
+          routes,
+          bookingBus.routeName || '',
+          currentBooking.pickupStop || '',
+          currentBooking.dropStop || '',
+          latestProfileData.pickup_address || '',
+          latestProfileData.drop_address || ''
+        );
+
+        const resolvedFromAddress = currentBooking.pickupStop || latestProfileData.pickup_address || bookingBus.routeName || 'Source';
+        const resolvedToAddress = currentBooking.dropStop || latestProfileData.drop_address || schoolName || latestProfileData.school_name || 'Destination';
+        const resolvedPickupTime = currentBooking.bookingStatus === 'Confirmed' ? 'Confirmed booking' : 'Pending confirmation';
+        const resolvedDriverName = matchedRoute?.driver?.name || matchedRoute?.driver?.full_name || 'Assigned Driver';
+
+        setBooking((previous) => ({
+          ...previous,
+          from: 'Source',
+          fromAddress: resolvedFromAddress,
+          to: 'Destination',
+          toName: resolvedToAddress,
+          pickupTime: resolvedPickupTime,
+        }));
+
+        setAssignedVan({
+          vanNumber: bookingBus.busNumber || 'Pending booking',
+          driverName: resolvedDriverName,
+          vanType: bookingBus.routeName || 'Van',
+        });
+
+        localStorage.setItem('currentBooking', JSON.stringify({
+          ...currentBooking,
+          sourceAddress: resolvedFromAddress,
+          destinationAddress: resolvedToAddress,
+          driverName: resolvedDriverName,
+          vanNumber: bookingBus.busNumber || '',
+        }));
+      } catch (error) {
+        console.error('Unable to load ride details:', error);
+      }
+    };
+
+    loadRideDetails();
+  }, [schoolName]);
 
   // Listen for school name changes (when selected in ProfileCompletion)
   useEffect(() => {
@@ -128,7 +220,7 @@ export default function ParentBookingHome() {
           <div className="location-card" onClick={handleFromClick}>
             <div className="card-icon">🏠</div>
             <div className="card-content">
-              <div className="card-label">From <strong>Home</strong></div>
+              <div className="card-label">From <strong>Pickup Address</strong></div>
               <div className="card-address">{booking.fromAddress}</div>
             </div>
             <div className="card-arrow">›</div>
@@ -138,7 +230,7 @@ export default function ParentBookingHome() {
           <div className="location-card" onClick={handleToClick}>
             <div className="card-icon">🏫</div>
             <div className="card-content">
-              <div className="card-label">To <strong>School</strong></div>
+              <div className="card-label">To <strong>Destination</strong></div>
               <div className="card-address">{booking.toName}</div>
             </div>
             <div className="card-arrow">›</div>
