@@ -18,11 +18,12 @@ export const register = async (req, res) => {
   }
 
   email = email.toLowerCase().trim();
+  role = String(role).toLowerCase().trim();
 
-  if(!['parent','driver','student','admin'].includes(role)){
+  if(!['student','driver'].includes(role)){
     return res.status(400).json({
       success: false,
-      message: "Role must be 'parent', 'driver', 'student', or 'admin'"
+      message: "Role must be 'student' or 'driver'"
     });
   }
   if(password.length < 6){

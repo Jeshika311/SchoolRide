@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiAlertTriangle, FiBell, FiCheckCircle, FiRefreshCw, FiShield } from 'react-icons/fi';
 import { useNotifications } from '../../context/NotificationContext';
 import NotificationList from '../../components/Notification/NotificationList';
 
 export default function NotificationsPage() {
+  const navigate = useNavigate();
   const {
     notifications,
     unreadCount,
@@ -38,16 +40,41 @@ export default function NotificationsPage() {
     <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #eef2ff 0%, #f8fafc 40%, #ffffff 100%)', padding: '28px 16px 40px' }}>
       <div style={{ maxWidth: '980px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
-          <div>
-            <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: '11px', fontWeight: 800, color: '#64748b' }}>
-              Live updates
-            </p>
-            <h1 style={{ margin: '8px 0 10px', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.04em' }}>
-              Notifications
-            </h1>
-            <p style={{ margin: 0, color: '#475569', fontSize: '15px', maxWidth: '620px', lineHeight: 1.7 }}>
-              Track ride events, safety alerts, delays, and system updates in one place.
-            </p>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label="Go back"
+              style={{
+                width: '44px',
+                height: '44px',
+                border: '0',
+                borderRadius: '14px',
+                background: '#fff',
+                color: '#0f172a',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: 1,
+                padding: 0,
+                boxShadow: '0 8px 20px rgba(15, 23, 42, 0.08)',
+                cursor: 'pointer',
+                flexShrink: 0
+              }}
+            >
+              ←
+            </button>
+            <div>
+              <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: '11px', fontWeight: 800, color: '#64748b' }}>
+                Live updates
+              </p>
+              <h1 style={{ margin: '8px 0 10px', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.04em' }}>
+                Notifications
+              </h1>
+              <p style={{ margin: 0, color: '#475569', fontSize: '15px', maxWidth: '620px', lineHeight: 1.7 }}>
+                Track ride events, safety alerts, delays, and system updates in one place.
+              </p>
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

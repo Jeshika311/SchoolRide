@@ -1,6 +1,25 @@
 import axios from 'axios';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
+const getDefaultApiBaseUrl = () => {
+	if (import.meta.env.VITE_API_BASE_URL) {
+		return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+	}
+
+	if (typeof window !== 'undefined') {
+		const { protocol, hostname, port } = window.location;
+		const isViteDevServer = port === '5173' || port === '4173';
+
+		if (isViteDevServer) {
+			return '/api';
+		}
+
+		return `${protocol}//${hostname}:5000/api`;
+	}
+
+	return '/api';
+};
+
+const API_BASE_URL = getDefaultApiBaseUrl().replace(/\/$/, '');
 
 export const apiClient = axios.create({
 	baseURL: API_BASE_URL,

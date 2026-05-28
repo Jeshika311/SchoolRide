@@ -1,6 +1,8 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { NotificationProvider } from './context/NotificationContext';
 import NotificationsPage from './pages/Notifications/NotificationsPage';
 import TermsAcceptModal from './components/Terms/TermsAcceptModal';
@@ -13,6 +15,13 @@ import VerifyOtp from './pages/Login/VerifyOtp';
 import ResetPassword from './pages/Login/ResetPassword';
 import ParentBookingHome from './pages/Booking/ParentBookingHome';
 import ProfilePage from './pages/Profile/ProfilePage';
+import DriverProfile from './pages/Profile/DriverProfile';
+import DriverDashboard from './pages/Driver/DriverDashboard';
+import DriverRides from './pages/Driver/DriverRides';
+import DriverTracking from './pages/Driver/DriverTracking';
+import DriverNotifications from './pages/Driver/DriverNotifications';
+import DriverEarnings from './pages/Driver/DriverEarnings';
+import DriverHistory from './pages/Driver/DriverHistory';
 import CustomerSupportPage from './pages/Support/CustomerSupportPage';
 import FAQsPage from './pages/Support/FAQsPage';
 import PrivacyTermsPage from './pages/Support/PrivacyTermsPage';
@@ -23,17 +32,18 @@ import ChangePasswordPage from './pages/Profile/ChangePasswordPage';
 import VerifyOTPPage from './pages/Profile/VerifyOTPPage';
 
 // SchoolRide Pages
-import StudentDashboard from './pages/StudentDashboard';
-import BusListing from './pages/BusListing';
-import SeatSelection from './pages/SeatSelection';
-import PaymentPage from './pages/PaymentPage';
-import BookingHistory from './pages/BookingHistory';
-import LiveTracking from './pages/LiveTracking';
-import AdminDashboard from './pages/AdminDashboard';
-import ManageBuses from './pages/ManageBuses';
-import ManageBookings from './pages/ManageBookings';
-import PaymentRecords from './pages/PaymentRecords';
-import AdminTracking from './pages/AdminTracking';
+import StudentDashboard from './pages/Home/StudentDashboard';
+import BusListing from './pages/Home/BusListing';
+import SeatSelection from './pages/Home/SeatSelection';
+import PaymentPage from './pages/Home/PaymentPage';
+import BookingHistory from './pages/Home/BookingHistory';
+import RideStatusPage from './pages/Home/RideStatusPage';
+import LiveTracking from './pages/Home/LiveTracking';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import ManageBuses from './pages/Admin/ManageBuses';
+import ManageBookings from './pages/Admin/ManageBookings';
+import PaymentRecords from './pages/Admin/PaymentRecords';
+import AdminTracking from './pages/Admin/AdminTracking';
 
 function HomeRoute() {
   const user = JSON.parse(localStorage.getItem('authUser') || '{}');
@@ -42,8 +52,12 @@ function HomeRoute() {
   if (role === 'parent') {
     return <ParentBookingHome />;
   }
+
+  if (role === 'driver') {
+    return <DriverDashboard />;
+  }
   if (role === 'student') {
-    return <StudentDashboard />;
+    return <ParentBookingHome />;
   }
   if (role === 'admin') {
     return <AdminDashboard />;
@@ -67,12 +81,12 @@ function AppContent() {
     localStorage.getItem('onboardingComplete') === 'true' || false
   );
   const hasAuthenticatedUser = Boolean(localStorage.getItem('authUser'));
-  const termsAccepted = localStorage.getItem('termsAccepted') === 'true';
+  const userRole = localStorage.getItem('userRole') || JSON.parse(localStorage.getItem('authUser') || '{}').role || 'user';
+  const [termsAccepted, setTermsAccepted] = useState(localStorage.getItem('termsAccepted') === 'true');
 
   const handleOnboardingFinish = (role) => {
-    if (role) {
-      localStorage.setItem('userRole', role);
-    }
+    const selectedRole = role === 'driver' ? 'driver' : 'student';
+    localStorage.setItem('userRole', selectedRole);
     localStorage.setItem('onboardingComplete', 'true');
     setOnboardingComplete(true);
     navigate('/register', { replace: true });
@@ -80,6 +94,7 @@ function AppContent() {
 
   const handleTermsAccept = () => {
     localStorage.setItem('termsAccepted', 'true');
+    setTermsAccepted(true);
   };
 
   const publicLegalRoutes = ['/terms', '/privacy', '/privacy-terms', '/privacy-policy', '/terms-conditions'];
@@ -94,8 +109,20 @@ function AppContent() {
         <Route path="/profile-completion" element={onboardingComplete ? <ProfileCompletion /> : <Navigate to="/" replace />} />
         <Route path="/login" element={onboardingComplete ? <LoginPage /> : <Navigate to="/" replace />} />
         <Route path="/home" element={onboardingComplete ? <HomeRoute /> : <Navigate to="/" replace />} />
-        <Route path="/profile" element={onboardingComplete ? <ProfilePage /> : <Navigate to="/" replace />} />
-        <Route path="/account-info" element={onboardingComplete ? <AccountInfoPage /> : <Navigate to="/" replace />} />
+        <Route path="/driver/dashboard" element={onboardingComplete ? <DriverDashboard /> : <Navigate to="/" replace />} />
+        <Route path="/driver-dashboard" element={<Navigate to="/driver/dashboard" replace />} />
+        <Route path="/driver/rides" element={onboardingComplete ? <DriverRides /> : <Navigate to="/" replace />} />
+        <Route path="/driver/tracking" element={onboardingComplete ? <DriverTracking /> : <Navigate to="/" replace />} />
+        <Route path="/driver/notifications" element={onboardingComplete ? <DriverNotifications /> : <Navigate to="/" replace />} />
+        <Route path="/driver/earnings" element={onboardingComplete ? <DriverEarnings /> : <Navigate to="/" replace />} />
+        <Route path="/driver/history" element={onboardingComplete ? <DriverHistory /> : <Navigate to="/" replace />} />
+        <Route
+          path="/profile"
+          element={onboardingComplete ? (userRole === 'driver' ? <DriverProfile /> : <ProfilePage />) : <Navigate to="/" replace />}
+        />
+        <Route path="/driver/profile" element={onboardingComplete ? <DriverProfile /> : <Navigate to="/" replace />} />
+        <Route path="/driver-profile" element={<Navigate to="/driver/profile" replace />} />
+        <Route path="/account-info" element={onboardingComplete ? (userRole === 'driver' ? <DriverProfile /> : <AccountInfoPage />) : <Navigate to="/" replace />} />
         <Route path="/change-password" element={onboardingComplete ? <ChangePasswordPage /> : <Navigate to="/" replace />} />
         <Route path="/verify-otp" element={onboardingComplete ? <VerifyOTPPage /> : <Navigate to="/" replace />} />
         <Route path="/help" element={onboardingComplete ? <CustomerSupportPage /> : <Navigate to="/" replace />} />
@@ -115,6 +142,7 @@ function AppContent() {
         <Route path="/buses" element={onboardingComplete ? <BusListing /> : <Navigate to="/" replace />} />
         <Route path="/seat-selection/:busId" element={onboardingComplete ? <SeatSelection /> : <Navigate to="/" replace />} />
         <Route path="/payment/:bookingId" element={onboardingComplete ? <PaymentPage /> : <Navigate to="/" replace />} />
+        <Route path="/ride-status" element={onboardingComplete ? <RideStatusPage /> : <Navigate to="/" replace />} />
         <Route path="/history" element={onboardingComplete ? <BookingHistory /> : <Navigate to="/" replace />} />
         <Route path="/track/:busId" element={onboardingComplete ? <LiveTracking /> : <Navigate to="/" replace />} />
 
@@ -133,6 +161,7 @@ function AppContent() {
 function App() {
   return (
     <NotificationProvider>
+      <ToastContainer position="top-right" autoClose={2200} newestOnTop closeOnClick pauseOnHover />
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>
@@ -141,3 +170,4 @@ function App() {
 }
 
 export default App;
+

@@ -41,7 +41,7 @@ export default function RegisterPage() {
       email: formData.email.trim(),
       phone_number: formData.phone_number.trim(),
       password: formData.password,
-      role: localStorage.getItem('userRole') || 'parent',
+      role: localStorage.getItem('userRole') === 'driver' ? 'driver' : 'student',
       preferred_language: 'English',
     };
 

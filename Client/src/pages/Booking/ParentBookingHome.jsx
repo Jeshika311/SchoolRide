@@ -55,24 +55,24 @@ export default function ParentBookingHome() {
   }, []);
 
   const handleFromClick = () => {
-    // Navigate to location selector
-    navigate('/booking/select-location', { state: { type: 'from' } });
+    // Open the bus list so the user can choose a route and continue booking.
+    navigate('/buses');
   };
 
   const handleToClick = () => {
-    // Navigate to location selector
-    navigate('/booking/select-location', { state: { type: 'to' } });
+    // Open the bus list so the user can choose a route and continue booking.
+    navigate('/buses');
   };
 
   const handlePickupTimeClick = () => {
-    // Navigate to time picker
-    navigate('/booking/select-time');
+    // Open the booking history screen until a dedicated time picker exists.
+    navigate('/history');
   };
 
   const handleConfirmRide = () => {
     // Save booking and navigate to confirmation
     localStorage.setItem('currentBooking', JSON.stringify(booking));
-    navigate('/booking/confirm');
+    navigate('/history');
   };
 
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
@@ -96,14 +96,19 @@ export default function ParentBookingHome() {
           <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <NotificationBell />
             <div className="header-nav">
-              <div className="header-nav-item">
+              <button type="button" className="header-nav-item" onClick={() => navigate('/history')} style={{ border: 'none', background: 'transparent' }}>
                 <span className="header-nav-icon">✓</span>
                 <span className="header-nav-label">Bookings</span>
-              </div>
-              <div className="header-nav-item">
+              </button>
+              <button
+                type="button"
+                className="header-nav-item"
+                onClick={() => navigate('/ride-status')}
+                style={{ border: 'none', background: 'transparent' }}
+              >
                 <span className="header-nav-icon">🔍</span>
                 <span className="header-nav-label">Tracking</span>
-              </div>
+              </button>
               <div className="header-nav-item" onClick={openProfileDrawer} style={{cursor: 'pointer'}}>
                 <span className="header-nav-icon">👤</span>
                 <span className="header-nav-label">Profile</span>
