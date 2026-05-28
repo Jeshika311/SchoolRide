@@ -5,13 +5,12 @@ const getDefaultApiBaseUrl = () => {
 		return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
 	}
 
-	if (typeof window !== 'undefined') {
-		const { protocol, hostname, port } = window.location;
-		const isViteDevServer = port === '5173' || port === '4173';
+	if (import.meta.env.DEV) {
+		return '/api';
+	}
 
-		if (isViteDevServer) {
-			return '/api';
-		}
+	if (typeof window !== 'undefined') {
+		const { protocol, hostname } = window.location;
 
 		return `${protocol}//${hostname}:5000/api`;
 	}
