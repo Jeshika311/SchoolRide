@@ -204,7 +204,7 @@ export default function StudentDashboard() {
                 {activeBooking.bookingStatus === 'Payment Pending' && (
                   <button 
                     onClick={() => navigate(`/payment/${activeBooking._id}`)}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-200"
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-700 to-cyan-600 hover:from-sky-600 hover:to-cyan-500 text-white font-semibold rounded-xl border border-sky-600 shadow-lg shadow-sky-700/20 transition-all duration-200"
                   >
                     <FaCreditCard size={16} />
                     Complete Payment
