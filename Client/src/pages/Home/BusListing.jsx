@@ -195,14 +195,15 @@ export default function BusListing() {
                     onClick={() => navigate(`/seat-selection/${bus._id}`)}
                     disabled={availableCount <= 0}
                     className={`
-                      w-full mt-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200
+                      w-full mt-6 min-h-[3.5rem] px-4 rounded-xl font-bold text-base leading-none flex items-center justify-center gap-2 transition-all duration-200
+                      disabled:opacity-100
                       ${availableCount > 0 
-                        ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-500/15' 
-                        : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                        ? 'bg-gradient-to-r from-sky-700 to-cyan-600 hover:from-sky-600 hover:to-cyan-500 text-white border border-sky-600 shadow-md shadow-sky-700/20' 
+                        : 'bg-slate-100 text-slate-600 cursor-not-allowed border border-slate-200'
                       }
                     `}
                   >
-                    Select Seat & stops
+                    Select Seat & Stops
                     <FaArrowRight size={12} />
                   </button>
                 </div>
