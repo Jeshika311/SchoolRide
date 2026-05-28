@@ -131,7 +131,7 @@ export default function RideStatusPage() {
               {currentBooking.status === 'Confirmed' && currentBooking.busId && (
                 <button
                   onClick={() => navigate(`/track/${currentBooking.busId}`)}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-sky-600 text-white font-bold shadow-lg shadow-sky-500/15 hover:bg-sky-500"
+                  className="inline-flex items-center justify-center gap-2 min-h-[3rem] px-6 py-3 rounded-xl border border-sky-600 bg-gradient-to-r from-sky-700 to-cyan-600 text-white font-bold shadow-lg shadow-sky-700/20 hover:from-sky-600 hover:to-cyan-500 transition-all duration-200"
                 >
                   <FaMapMarkerAlt size={16} />
                   Open Live Tracking
