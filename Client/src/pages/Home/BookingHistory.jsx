@@ -66,6 +66,7 @@ export default function BookingHistory() {
   const previousBookings = bookings.filter((booking) => previousStatuses.has(booking.status));
 
   const sectionCardClass = 'bg-white border border-sky-100 rounded-2xl p-5 shadow-sm';
+  const bookingActionButtonClass = 'w-full sm:w-auto sm:min-w-[210px] flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-sky-700 to-cyan-600 hover:from-sky-600 hover:to-cyan-500 rounded-xl border border-sky-600 shadow-lg shadow-sky-700/20 transition-all duration-200 shrink-0';
 
   const renderBookingCard = (booking, trailingAction) => (
     <div key={booking.id} className="bg-white border border-sky-100 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-sky-200 shadow-sm transition-colors">
@@ -146,8 +147,9 @@ export default function BookingHistory() {
                   booking,
                   <button
                     onClick={() => booking.busId && navigate(`/track/${booking.busId}`)}
-                    className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-sky-700 border border-sky-200 bg-sky-50 hover:bg-sky-100 rounded-lg transition-colors"
+                    className={bookingActionButtonClass}
                   >
+                    <FaCreditCard size={12} />
                     View Ride Status
                     <FaAngleRight size={12} />
                   </button>
@@ -166,7 +168,7 @@ export default function BookingHistory() {
                   booking.status === 'Payment Pending' ? (
                     <button
                       onClick={() => navigate(`/payment/${booking.id}`)}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-500 rounded-lg shadow transition-all duration-200"
+                      className={bookingActionButtonClass}
                     >
                       <FaCreditCard size={12} />
                       Complete Payment
