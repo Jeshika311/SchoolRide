@@ -111,23 +111,23 @@ export default function SeatSelection() {
         {/* Back Link */}
         <button 
           onClick={() => navigate('/buses')}
-          className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-white transition-colors"
+          className="flex items-center gap-1.5 text-sm font-semibold text-sky-700 hover:text-sky-800 transition-colors"
         >
           <FaAngleLeft size={16} />
           Back to Buses
         </button>
 
         {/* Header Info */}
-        <div className="bg-slate-950/40 p-6 rounded-2xl border border-slate-800/80">
+        <div className="bg-white p-6 rounded-2xl border border-sky-100 shadow-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider block">Seat Reservation for</span>
-              <h1 className="text-xl font-extrabold text-white mt-1">Bus {bus?.busNumber}</h1>
-              <p className="text-sm text-slate-400">{bus?.routeName}</p>
+              <span className="text-xs font-semibold text-sky-600 uppercase tracking-wider block">Seat Reservation for</span>
+              <h1 className="text-xl font-extrabold text-slate-900 mt-1">Bus {bus?.busNumber}</h1>
+              <p className="text-sm text-slate-500">{bus?.routeName}</p>
             </div>
-            <div className="text-sm text-slate-300">
+            <div className="text-sm text-slate-600">
               <span className="text-xs text-slate-500 block">BASE MONTHLY COMMUTE FARE</span>
-              <span className="text-lg font-black text-slate-100">₹1,500.00 / seat</span>
+              <span className="text-lg font-black text-slate-900">₹1,500.00 / seat</span>
             </div>
           </div>
         </div>
@@ -141,29 +141,29 @@ export default function SeatSelection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           {/* Seating Layout Column */}
-          <div className="bg-slate-950/40 p-6 rounded-2xl border border-slate-800/80 flex flex-col items-center">
-            <h3 className="text-sm font-extrabold text-white uppercase tracking-wider mb-6">Bus Interior Seat Layout</h3>
+          <div className="bg-white p-6 rounded-2xl border border-sky-100 shadow-sm flex flex-col items-center">
+            <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-6">Bus Interior Seat Layout</h3>
             
             {/* Visual Indicators Legend */}
             <div className="flex gap-6 mb-8 text-xs font-semibold">
               <div className="flex items-center gap-1.5">
                 <span className="w-4 h-4 bg-emerald-500 rounded-md" />
-                <span className="text-slate-400">Available</span>
+                <span className="text-slate-600">Available</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-4 h-4 bg-rose-500 rounded-md" />
-                <span className="text-slate-400">Occupied</span>
+                <span className="text-slate-600">Occupied</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-4 h-4 bg-blue-600 rounded-md" />
-                <span className="text-slate-400">Selected</span>
+                <span className="text-slate-600">Selected</span>
               </div>
             </div>
 
             {/* Simulated Driver Position */}
-            <div className="w-full max-w-[280px] bg-slate-900 border border-slate-800/80 p-3 rounded-xl text-center mb-6 flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">DRIVE STEERING</span>
-              <span className="w-8 h-8 rounded-full border-4 border-slate-700 border-t-blue-500 animate-spin" />
+            <div className="w-full max-w-[280px] bg-slate-50 border border-sky-100 p-3 rounded-xl text-center mb-6 flex items-center justify-between shadow-sm">
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-widest">Drive Steering</span>
+              <span className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-sky-500 animate-spin" />
             </div>
 
             {/* Seats Grid */}
@@ -195,17 +195,17 @@ export default function SeatSelection() {
           </div>
 
           {/* Form & Stops Info Column */}
-          <div className="bg-slate-950/40 p-6 rounded-2xl border border-slate-800/80 flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-2xl border border-sky-100 shadow-sm flex flex-col justify-between">
             <form onSubmit={handleBookingSubmit} className="space-y-6">
-              <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">Select Commute Stops</h3>
+              <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Select Commute Stops</h3>
               
               {/* Pickup stop dropdown */}
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-2">PICKUP STOPS</label>
+                <label className="text-xs font-bold text-slate-500 block mb-2">PICKUP STOPS</label>
                 <select
                   value={pickupStop}
                   onChange={(e) => setPickupStop(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 px-4 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-slate-50 border border-sky-100 rounded-xl py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-sky-500 transition-colors"
                   required
                 >
                   <option value="">Select Pickup Stop</option>
@@ -217,11 +217,11 @@ export default function SeatSelection() {
 
               {/* Drop stop dropdown */}
               <div>
-                <label className="text-xs font-bold text-slate-400 block mb-2">DROP STOPS</label>
+                <label className="text-xs font-bold text-slate-500 block mb-2">DROP STOPS</label>
                 <select
                   value={dropStop}
                   onChange={(e) => setDropStop(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 px-4 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-slate-50 border border-sky-100 rounded-xl py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-sky-500 transition-colors"
                   required
                 >
                   <option value="">Select Drop Stop</option>
@@ -232,9 +232,9 @@ export default function SeatSelection() {
               </div>
 
               {/* Seat indicator summary */}
-              <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800/50 flex justify-between items-center text-sm">
-                <span className="text-slate-400 font-medium">Selected Seat</span>
-                <span className="font-extrabold text-blue-400 text-lg">
+              <div className="p-4 bg-slate-50 rounded-xl border border-sky-100 flex justify-between items-center text-sm shadow-sm">
+                <span className="text-slate-600 font-medium">Selected Seat</span>
+                <span className="font-extrabold text-sky-700 text-lg">
                   {selectedSeat ? `Seat #${selectedSeat}` : 'None Chosen'}
                 </span>
               </div>
@@ -243,7 +243,7 @@ export default function SeatSelection() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-sky-700 to-cyan-600 hover:from-sky-600 hover:to-cyan-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-sky-700/20 transition-all duration-200 flex items-center justify-center gap-2"
               >
                 {submitting ? 'Confirming details...' : 'Confirm booking & Proceed'}
                 <FaArrowRight size={12} />
