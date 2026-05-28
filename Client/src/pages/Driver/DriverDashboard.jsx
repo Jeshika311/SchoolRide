@@ -35,14 +35,14 @@ const statCards = [
 function StatCard({ item, value }) {
   const Icon = item.icon;
   return (
-    <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)] backdrop-blur">
-      <div className="flex items-center gap-4">
-        <div className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${item.accent} text-white shadow-lg shadow-slate-200`}>
+    <div className="rounded-3xl border border-slate-800/80 bg-slate-900/40 p-5 shadow-xl backdrop-blur">
+      <div className="flex items-center gap-4 text-left">
+        <div className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${item.accent} text-white shadow-[0_0_10px_rgba(99,102,241,0.25)]`}>
           <Icon className="text-xl" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-500">{item.label}</p>
-          <div className="text-3xl font-black tracking-tight text-slate-900">{value}</div>
+          <p className="text-xs font-semibold text-slate-400">{item.label}</p>
+          <div className="text-2xl font-black tracking-tight text-slate-100 mt-0.5">{value}</div>
         </div>
       </div>
     </div>
@@ -132,10 +132,10 @@ export default function DriverDashboard() {
 
   const summary = (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Driver</p>
-        <p className="mt-2 text-2xl font-black text-slate-900">{user.name || 'Driver'}</p>
-        <p className="mt-1 text-sm text-slate-600">{user.email || 'No email linked'}</p>
+      <div className="rounded-[2rem] border border-slate-800/80 bg-slate-900/40 p-5 shadow-xl text-left">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-400">Driver</p>
+        <p className="mt-2 text-xl font-black text-slate-100">{user.name || 'Driver'}</p>
+        <p className="mt-1 text-xs text-slate-400 truncate">{user.email || 'No email linked'}</p>
       </div>
       {statCards.map((item) => (
         <StatCard key={item.key} item={item} value={stats[item.key] ?? 0} />
@@ -145,28 +145,28 @@ export default function DriverDashboard() {
 
   const actions = (
     <>
-      <button type="button" onClick={() => navigate('/driver/profile')} className="rounded-2xl bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 ring-1 ring-blue-100">
-        <FiEdit3 className="inline-block -translate-y-px" /> Edit profile
+      <button type="button" onClick={() => navigate('/driver/profile')} className="rounded-2xl bg-indigo-950/40 px-4 py-3 text-xs font-bold text-indigo-400 border border-indigo-900/60 transition-colors">
+        <FiEdit3 className="inline-block -translate-y-px mr-1" /> Edit profile
       </button>
-      <button type="button" onClick={refreshDashboard} className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 ring-1 ring-slate-200">
-        <FiRefreshCw className="inline-block -translate-y-px" /> Refresh
+      <button type="button" onClick={refreshDashboard} className="rounded-2xl bg-slate-900 px-4 py-3 text-xs font-bold text-slate-300 border border-slate-800 hover:text-white transition-colors">
+        <FiRefreshCw className="inline-block -translate-y-px mr-1" /> Refresh
       </button>
-      <button type="button" onClick={handleLogout} className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 ring-1 ring-rose-100">
-        <FiLogOut className="inline-block -translate-y-px" /> Logout
+      <button type="button" onClick={handleLogout} className="rounded-2xl bg-rose-950/30 px-4 py-3 text-xs font-bold text-rose-400 border border-rose-900/50 hover:bg-rose-900/20 transition-colors">
+        <FiLogOut className="inline-block -translate-y-px mr-1" /> Logout
       </button>
     </>
   );
 
   if (loading) {
-    return <div className="min-h-screen bg-slate-100 p-6 text-slate-900">Loading...</div>;
+    return <div className="min-h-screen bg-[#070A13] p-6 text-slate-400">Loading...</div>;
   }
 
   if (error) {
     return (
-      <div className="min-h-screen grid place-items-center bg-slate-100 p-6 text-slate-900">
-        <div className="max-w-lg rounded-3xl bg-white p-8 text-center shadow-xl shadow-slate-200">
-          <p className="text-lg font-bold">{error}</p>
-          <button onClick={refreshDashboard} className="mt-6 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white">Retry</button>
+      <div className="min-h-screen grid place-items-center bg-[#070A13] p-6 text-slate-400">
+        <div className="max-w-lg rounded-3xl bg-slate-900 border border-slate-800 p-8 text-center shadow-2xl">
+          <p className="text-lg font-bold text-slate-200">{error}</p>
+          <button onClick={refreshDashboard} className="mt-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-5 py-3 font-semibold text-white">Retry</button>
         </div>
       </div>
     );
@@ -184,26 +184,26 @@ export default function DriverDashboard() {
       onLogout={handleLogout}
       activePath="/driver/dashboard"
     >
-      <div className="rounded-[2rem] border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)] backdrop-blur">
-        <h3 className="text-xl font-black text-slate-900">Profile summary</h3>
-        <p className="mt-1 text-sm text-slate-500">Your current driver record, availability, and quick account details.</p>
+      <div className="rounded-[2rem] border border-slate-800/80 bg-slate-900/40 p-6 shadow-xl backdrop-blur text-left">
+        <h3 className="text-lg font-black text-white">Profile summary</h3>
+        <p className="mt-1 text-xs text-slate-400">Your current driver record, availability, and quick account details.</p>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-3xl bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Email</p>
-            <p className="mt-2 text-lg font-black text-slate-900">{user.email || 'No email linked'}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 text-xs font-semibold">
+          <div className="rounded-2xl bg-slate-950/40 border border-slate-800/60 p-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Email</p>
+            <p className="mt-2 text-sm text-slate-200 block truncate">{user.email || 'No email linked'}</p>
           </div>
-          <div className="rounded-3xl bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Phone</p>
-            <p className="mt-2 text-lg font-black text-slate-900">{user.phone_number || 'Not set'}</p>
+          <div className="rounded-2xl bg-slate-950/40 border border-slate-800/60 p-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Phone</p>
+            <p className="mt-2 text-sm text-slate-200 block">{user.phone_number || 'Not set'}</p>
           </div>
-          <div className="rounded-3xl bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Vehicle type</p>
-            <p className="mt-2 text-lg font-black text-slate-900">{dashboard.profile?.vehicle_type || 'Not set'}</p>
+          <div className="rounded-2xl bg-slate-950/40 border border-slate-800/60 p-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Vehicle type</p>
+            <p className="mt-2 text-sm text-slate-200 block">{dashboard.profile?.vehicle_type || 'Not set'}</p>
           </div>
-          <div className="rounded-3xl bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Status</p>
-            <p className="mt-2 text-lg font-black text-slate-900">{dashboard.availability ? 'Online' : 'Offline'}</p>
+          <div className="rounded-2xl bg-slate-950/40 border border-slate-800/60 p-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Status</p>
+            <p className="mt-2 text-sm text-slate-200 block">{dashboard.availability ? 'Online' : 'Offline'}</p>
           </div>
         </div>
       </div>

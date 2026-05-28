@@ -750,3 +750,5 @@
 {"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-27T08:53:47.697Z"}
 {"level":"info","message":"GET /api/bookings/my-bookings","service":"schoolride-api","timestamp":"2026-05-27T08:53:47.760Z"}
 {"level":"info","message":"Socket disconnected: twOTNwMn8vB1rmh9AAAU (User: 6a16b0b66044f7be105b0a46)","service":"schoolride-api","timestamp":"2026-05-27T08:53:51.461Z"}
+{"level":"info","message":"Server safely started on http://localhost:5000","service":"schoolride-api","timestamp":"2026-05-28T08:15:17.179Z"}
+{"level":"info","message":"Socket connected: N8Fck4h9bq-eouLwAAAB (User: 6a16f9767bedacd8505137a0, Role: student)","service":"schoolride-api","timestamp":"2026-05-28T08:15:17.224Z"}
