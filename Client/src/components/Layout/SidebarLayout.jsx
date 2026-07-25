@@ -22,9 +22,17 @@ export default function SidebarLayout({ children }) {
 
   const user = JSON.parse(localStorage.getItem('authUser') || '{}');
   const role = user.role || 'student';
+  const initials = (user?.name || 'U')
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   const handleLogout = () => {
     localStorage.removeItem('authUser');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
     localStorage.removeItem('termsAccepted');
     navigate('/login', { replace: true });
@@ -40,6 +48,7 @@ export default function SidebarLayout({ children }) {
   const adminLinks = [
     { name: 'Admin Dashboard', path: '/home', icon: FaThLarge },
     { name: 'Manage Buses', path: '/admin/buses', icon: FaSlidersH },
+    { name: 'Manage Routes', path: '/admin/routes', icon: FaMapMarkerAlt },
     { name: 'Manage Bookings', path: '/admin/bookings', icon: FaBus },
     { name: 'Payment Records', path: '/admin/payments', icon: FaReceipt },
     { name: 'Tracking Board', path: '/admin/tracking', icon: FaMapMarkerAlt },
@@ -94,17 +103,22 @@ export default function SidebarLayout({ children }) {
 
           {/* Profile Quick Card - Logged in user details */}
           <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-8">
-            <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-blue-500 bg-slate-100">
-              <img 
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100" 
-                alt={user?.name || 'User'} 
-                className="w-full h-full object-cover"
-              />
+            <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-blue-500 bg-gradient-to-br from-blue-500 to-cyan-400 text-white flex items-center justify-center font-black shadow-sm">
+              {user?.profile_photo ? (
+                <img
+                  src={user.profile_photo}
+                  alt={user?.name || 'User'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xs">{initials}</span>
+              )}
             </div>
-            <div className="overflow-hidden text-left">
-              <h4 className="font-bold text-sm truncate text-slate-900">{user?.name || 'Aria'}</h4>
+            <div className="overflow-hidden text-left min-w-0">
+              <h4 className="font-bold text-sm truncate text-slate-900">{user?.name || 'Signed in user'}</h4>
+              <p className="text-[11px] text-slate-500 truncate">{user?.email || 'No email linked'}</p>
               <span className="text-[9px] font-extrabold uppercase tracking-widest text-blue-600 block mt-0.5">
-                {role === 'parent' ? 'PARENT MONITOR' : 'STUDENT'}
+                {String(role).toUpperCase()}
               </span>
             </div>
           </div>
