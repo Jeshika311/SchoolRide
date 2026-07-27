@@ -35,12 +35,21 @@ export const getApiUrl = (endpoint = '') => {
 
 export const fetchApi = async (endpoint, options = {}) => {
 	try {
+		const storedToken = typeof localStorage !== 'undefined' ? localStorage.getItem('authToken') : null;
+		const requestHeaders = {
+			...(options.headers || {}),
+		};
+
+		if (storedToken && !requestHeaders.Authorization && !requestHeaders.authorization) {
+			requestHeaders.Authorization = `Bearer ${storedToken}`;
+		}
+
 		const response = await apiClient.request({
 			url: endpoint,
 			method: (options.method || 'GET').toLowerCase(),
 			data: options.body ?? options.data,
 			params: options.params,
-			headers: options.headers,
+			headers: requestHeaders,
 		});
 
 		return {
