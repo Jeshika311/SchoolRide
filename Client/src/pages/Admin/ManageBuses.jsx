@@ -6,7 +6,9 @@ import { FaBus, FaPlus, FaTrash, FaEdit, FaTimes, FaSave } from 'react-icons/fa'
 export default function ManageBuses() {
   const [buses, setBuses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingOptions, setLoadingOptions] = useState(true);
   const [error, setError] = useState(null);
+  const [assignmentOptions, setAssignmentOptions] = useState({ drivers: [], routes: [] });
 
   // Form states
   const [editingId, setEditingId] = useState(null);
@@ -17,13 +19,33 @@ export default function ManageBuses() {
     routeName: '',
     pickupStopsString: '',
     dropStopsString: '',
+    driver: '',
+    route: '',
+    status: 'active',
     latitude: 12.9716,
     longitude: 77.5946
   });
 
   useEffect(() => {
-    fetchBuses();
+    Promise.all([fetchBuses(), fetchAssignmentOptions()]);
   }, []);
+
+  const fetchAssignmentOptions = async () => {
+    try {
+      setLoadingOptions(true);
+      const { status, data } = await fetchApi('/user/assignment-options');
+      if (status === 200 && data?.success) {
+        setAssignmentOptions({
+          drivers: data.data?.drivers || [],
+          routes: data.data?.routes || []
+        });
+      }
+    } catch (err) {
+      setError(err.message || 'Error loading assignment options.');
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
 
   const fetchBuses = async () => {
     try {
@@ -53,6 +75,9 @@ export default function ManageBuses() {
       routeName: bus.routeName,
       pickupStopsString: bus.pickupStops.join(', '),
       dropStopsString: bus.dropStops.join(', '),
+      driver: bus.driver?._id || '',
+      route: bus.route?._id || '',
+      status: bus.status || 'active',
       latitude: bus.currentLocation?.lat || 12.9716,
       longitude: bus.currentLocation?.lng || 77.5946
     });
@@ -67,6 +92,9 @@ export default function ManageBuses() {
       routeName: '',
       pickupStopsString: 'Main Gate, Cross Roads, City Center',
       dropStopsString: 'School Yard, Science Block, Library',
+      driver: '',
+      route: '',
+      status: 'active',
       latitude: 12.9716,
       longitude: 77.5946
     });
@@ -107,6 +135,9 @@ export default function ManageBuses() {
       routeName: form.routeName.trim(),
       pickupStops,
       dropStops,
+      driver: form.driver || undefined,
+      route: form.route || undefined,
+      status: form.status,
       currentLocation: {
         lat: parseFloat(form.latitude),
         lng: parseFloat(form.longitude)
@@ -143,7 +174,7 @@ export default function ManageBuses() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-sky-600">Fleet management</p>
             <h1 className="text-3xl md:text-4xl font-black text-slate-950 tracking-tight">Manage Transit Fleet</h1>
-            <p className="text-sm text-slate-500 max-w-2xl">Configure buses, seat quantities, and school stops</p>
+            <p className="text-sm text-slate-500 max-w-2xl">Configure buses, seat quantities, assignments, and school stops</p>
           </div>
           <button 
             onClick={handleCreateClick}
@@ -175,6 +206,8 @@ export default function ManageBuses() {
                   <tr className="border-b border-sky-100 bg-sky-50 text-xs font-bold text-slate-500 uppercase tracking-wider">
                     <th className="px-6 py-4">Bus Details</th>
                     <th className="px-6 py-4">Route Name</th>
+                    <th className="px-6 py-4">Driver</th>
+                    <th className="px-6 py-4">Status</th>
                     <th className="px-6 py-4">Seats Allocated</th>
                     <th className="px-6 py-4">Stops Config</th>
                     <th className="px-6 py-4 text-right">Actions</th>
@@ -192,6 +225,14 @@ export default function ManageBuses() {
                         </div>
                       </td>
                       <td className="px-6 py-4 font-semibold text-slate-800">{bus.routeName}</td>
+                      <td className="px-6 py-4 text-slate-700">
+                        {bus.driver?.name || 'Unassigned'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`rounded-full px-3 py-1 text-xs font-bold ${bus.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                          {bus.status || 'active'}
+                        </span>
+                      </td>
                       <td className="px-6 py-4">
                         <span className="text-slate-500">
                           {bus.occupiedSeats?.length || 0} / {bus.totalSeats} seats
@@ -269,6 +310,57 @@ export default function ManageBuses() {
                   />
                 </div>
                 <div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 block mb-1">Driver Assignment</label>
+                  <select
+                    name="driver"
+                    value={form.driver}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-700 focus:outline-none focus:border-sky-400"
+                    disabled={loadingOptions}
+                  >
+                    <option value="">Select a completed active driver</option>
+                    {assignmentOptions.drivers.map((driver) => (
+                      <option key={driver._id} value={driver._id}>
+                        {driver.name} {driver.profile?.vehicle_number ? `• ${driver.profile.vehicle_number}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 block mb-1">Route Assignment</label>
+                  <select
+                    name="route"
+                    value={form.route}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-700 focus:outline-none focus:border-sky-400"
+                    disabled={loadingOptions}
+                  >
+                    <option value="">Select route</option>
+                    {assignmentOptions.routes.map((route) => (
+                      <option key={route._id} value={route._id}>
+                        {route.route_name || `${route.start_location} → ${route.end_location}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-500 block mb-1">Status</label>
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={handleInputChange}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-700 focus:outline-none focus:border-sky-400"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
                   <label className="text-xs font-bold text-slate-500 block mb-1">Total Seat Count</label>
                   <input
                     type="number"
