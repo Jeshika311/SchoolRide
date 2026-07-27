@@ -41,6 +41,7 @@ import RideStatusPage from './pages/Home/RideStatusPage';
 import LiveTracking from './pages/Home/LiveTracking';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import ManageBuses from './pages/Admin/ManageBuses';
+import ManageRoutes from './pages/Admin/ManageRoutes';
 import ManageBookings from './pages/Admin/ManageBookings';
 import PaymentRecords from './pages/Admin/PaymentRecords';
 import AdminTracking from './pages/Admin/AdminTracking';
@@ -148,6 +149,7 @@ function AppContent() {
 
         {/* Admin Routes */}
         <Route path="/admin/buses" element={onboardingComplete ? <ManageBuses /> : <Navigate to="/" replace />} />
+        <Route path="/admin/routes" element={onboardingComplete ? <ManageRoutes /> : <Navigate to="/" replace />} />
         <Route path="/admin/bookings" element={onboardingComplete ? <ManageBookings /> : <Navigate to="/" replace />} />
         <Route path="/admin/payments" element={onboardingComplete ? <PaymentRecords /> : <Navigate to="/" replace />} />
         <Route path="/admin/tracking" element={onboardingComplete ? <AdminTracking /> : <Navigate to="/" replace />} />
