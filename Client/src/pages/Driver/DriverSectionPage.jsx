@@ -124,6 +124,7 @@ export default function DriverSectionPage({ section }) {
     const deviceToken = storedUser.device_token || storedUser.fcmToken || storedUser.deviceToken;
     await fetchApi('/auth/logout', { method: 'POST', body: JSON.stringify(deviceToken ? { device_token: deviceToken } : {}) });
     localStorage.removeItem('authUser');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
     localStorage.removeItem('profileData');
     localStorage.removeItem('driverProfileData');
