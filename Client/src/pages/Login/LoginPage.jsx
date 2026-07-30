@@ -41,6 +41,9 @@ export default function LoginPage() {
 
     if (status === 200) {
       localStorage.setItem('authUser', JSON.stringify(data.user || {}));
+      if (data.token) {
+        localStorage.setItem('authToken', data.token);
+      }
       localStorage.setItem('termsAccepted', data.user?.termsAccepted ? 'true' : 'false');
       if (data.user?.role) {
         localStorage.setItem('userRole', data.user.role);
