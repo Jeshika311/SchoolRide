@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiAlertTriangle, FiBell, FiCheckCircle, FiRefreshCw, FiShield } from 'react-icons/fi';
 import { useNotifications } from '../../context/NotificationContext';
 import NotificationList from '../../components/Notification/NotificationList';
+import { fetchApi } from '../../api';
 
 export default function NotificationsPage() {
   const navigate = useNavigate();
@@ -17,23 +18,64 @@ export default function NotificationsPage() {
   } = useNotifications();
 
   const [filter, setFilter] = useState('all');
+  const [pageNotifications, setPageNotifications] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadNotifications = async () => {
+      const response = await fetchApi('/notification?limit=50');
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (response.status === 200 && response.data?.success) {
+        setPageNotifications(Array.isArray(response.data.data) ? response.data.data : []);
+      }
+    };
+
+    loadNotifications().catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const allNotifications = useMemo(() => {
+    const combined = [...pageNotifications, ...notifications];
+    const deduped = new Map();
+
+    combined.forEach((notification) => {
+      if (notification?._id) {
+        deduped.set(notification._id, notification);
+      }
+    });
+
+    return Array.from(deduped.values());
+  }, [notifications, pageNotifications]);
+
+  const unreadItems = useMemo(
+    () => allNotifications.filter((notification) => !notification.read),
+    [allNotifications]
+  );
 
   const filteredNotifications = useMemo(() => {
     if (filter === 'unread') {
-      return unreadNotifications;
+      return unreadItems;
     }
 
     if (filter === 'alerts') {
-      return notifications.filter((notification) => ['alert', 'delay', 'safety'].includes(notification.type));
+      return allNotifications.filter((notification) => ['alert', 'delay', 'safety'].includes(notification.type));
     }
 
-    return notifications;
-  }, [filter, notifications, unreadNotifications]);
+    return allNotifications;
+  }, [allNotifications, filter, unreadItems]);
 
   const stats = [
-    { label: 'Total', value: notifications.length, icon: FiBell, color: '#2563eb', background: '#eff6ff' },
+    { label: 'Total', value: allNotifications.length, icon: FiBell, color: '#2563eb', background: '#eff6ff' },
     { label: 'Unread', value: unreadCount, icon: FiShield, color: '#059669', background: '#ecfdf5' },
-    { label: 'Alerts', value: notifications.filter((notification) => ['alert', 'delay', 'safety'].includes(notification.type)).length, icon: FiAlertTriangle, color: '#d97706', background: '#fffbeb' }
+    { label: 'Alerts', value: allNotifications.filter((notification) => ['alert', 'delay', 'safety'].includes(notification.type)).length, icon: FiAlertTriangle, color: '#d97706', background: '#fffbeb' }
   ];
 
   return (
