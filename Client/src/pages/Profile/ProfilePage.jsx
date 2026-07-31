@@ -27,6 +27,7 @@ export default function ProfilePage({ isPopup = false, onClose }) {
     });
 
     localStorage.removeItem('authUser');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
     localStorage.removeItem('profileData');
     localStorage.removeItem('currentBooking');
@@ -49,6 +50,7 @@ export default function ProfilePage({ isPopup = false, onClose }) {
 
     // Keep onboarding state; remove signed-in user/session data.
     localStorage.removeItem('authUser');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
     localStorage.removeItem('profileData');
     localStorage.removeItem('currentBooking');
