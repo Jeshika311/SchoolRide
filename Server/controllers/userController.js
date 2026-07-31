@@ -2,8 +2,46 @@ import userModel from "../models/userModel.js";
 import DriverProfile from "../models/DriverProfile.js";
 import parentProfile from "../models/parentProfile.js";
 import bookingModel from "../models/bookingModel.js";
+import bookingNewModel from "../models/bookingNewModel.js";
+import busModel from "../models/busModel.js";
+import routeModel from "../models/routeModel.js";
+import paymentModel from "../models/paymentModel.js";
 import notificationModel from "../models/notificationModel.js";
 import SupportTicket from "../models/supportTicket.js";
+import { getEligibleDrivers } from '../utils/assignmentHelpers.js';
+import { emitToRole } from '../sockets/socketManager.js';
+
+const mapBookingModel = (booking) => ({
+  id: booking._id,
+  status: booking.status,
+  bookingStatus: booking.bookingStatus,
+  tripStatus: booking.trip_status,
+  childName: booking.child_name,
+  pickupPoint: booking.pickup_point,
+  dropPoint: booking.drop_point,
+  pickupStop: booking.pickupStop,
+  dropStop: booking.dropStop,
+  seatNumber: booking.seatNumber,
+  bus: booking.busId || booking.vehicle || null,
+  route: booking.route_id || null,
+  driver: booking.driver_id || null,
+  parent: booking.parent_id || null,
+  student: booking.studentId || null,
+  createdAt: booking.createdAt,
+  updatedAt: booking.updatedAt
+});
+
+const isBusActive = (bus) => {
+  const lat = bus?.currentLocation?.lat ?? 0;
+  const lng = bus?.currentLocation?.lng ?? 0;
+  return lat !== 0 || lng !== 0;
+};
+
+const startOfDay = () => {
+  const value = new Date();
+  value.setHours(0, 0, 0, 0);
+  return value;
+};
 
 export const getProfile = async (req, res) => {
   try {
@@ -267,6 +305,10 @@ export const updateDriverAvailability = async (req, res) => {
       { new: true }
     ).select("-password");
 
+    ['admin', 'driver'].forEach((role) => {
+      emitToRole(role, 'dashboard_updated', { entity: 'driver', id: updatedUser._id, action: 'availability' });
+    });
+
     return res.status(200).json({
       success: true,
       message: `Driver is now ${updatedUser.isAvailable ? 'online' : 'offline'}`,
@@ -290,8 +332,11 @@ export const getDriverDashboard = async (req, res) => {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
-    const [profile, bookings, notifications, unreadCount] = await Promise.all([
+    const startOfToday = startOfDay();
+    const [profile, bus, route, bookings, notifications, unreadCount] = await Promise.all([
       DriverProfile.findOne({ user_id: userId }),
+      busModel.findOne({ driver: userId }).populate('route').populate('driver'),
+      routeModel.findOne({ driver: userId }).populate('assignedBus').populate('driver'),
       bookingModel.find({ driver_id: userId })
         .populate('parent_id', 'name email phone_number profile_photo')
         .populate('route_id')
@@ -305,6 +350,18 @@ export const getDriverDashboard = async (req, res) => {
     const activeBookings = bookings.filter((booking) => booking.status === 'accepted' && booking.trip_status !== 'dropped');
     const upcomingBookings = bookings.filter((booking) => booking.status === 'pending');
     const bookingHistory = bookings.filter((booking) => ['completed', 'rejected'].includes(booking.status));
+    const todayTrips = bus
+      ? await bookingNewModel.countDocuments({
+          busId: bus._id,
+          bookingStatus: 'Confirmed',
+          createdAt: { $gte: startOfToday }
+        }).catch(() => 0)
+      : 0;
+    const studentCount = bus
+      ? await bookingNewModel.countDocuments({ busId: bus._id, bookingStatus: 'Confirmed' }).catch(() => 0)
+      : 0;
+    const pickupStops = route?.stops || bus?.pickupStops || [];
+    const currentStatus = bus?.status || (user.isAvailable ? 'active' : 'inactive');
 
     const simplifiedBookings = (items) => items.map((booking) => ({
       id: booking._id,
@@ -328,6 +385,13 @@ export const getDriverDashboard = async (req, res) => {
       data: {
         user,
         profile,
+        assignedBus: bus,
+        assignedRoute: route,
+        currentStatus,
+        pickupStops,
+        todayTrips,
+        studentCount,
+        liveLocation: bus?.currentLocation || null,
         availability: Boolean(user.isAvailable),
         stats: {
           totalBookings: bookings.length,
@@ -348,6 +412,206 @@ export const getDriverDashboard = async (req, res) => {
   } catch (error) {
     console.error("Get Driver Dashboard Error:", error);
     return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const getDashboardOverview = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const user = await userModel.findById(userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const [roleProfile, notifications] = await Promise.all([
+      user.role === 'driver'
+        ? DriverProfile.findOne({ user_id: userId })
+        : user.role === 'parent'
+          ? parentProfile.findOne({ user_id: userId })
+          : Promise.resolve(null),
+      notificationModel.find({ user: userId }).sort({ createdAt: -1 }).limit(8)
+    ]);
+
+    if (user.role === 'admin') {
+      const today = startOfDay();
+      const [
+        totalDrivers,
+        totalParents,
+        totalBuses,
+        totalRoutes,
+        activeDrivers,
+        buses,
+        routes,
+        modernBookings,
+        legacyBookings,
+        revenueSummary,
+        recentBookings,
+        recentPayments
+      ] = await Promise.all([
+        userModel.countDocuments({ role: 'driver' }),
+        userModel.countDocuments({ role: 'parent' }),
+        busModel.countDocuments({}),
+        routeModel.countDocuments({}),
+        userModel.countDocuments({ role: 'driver', isAvailable: true }),
+        busModel.find({}).sort({ createdAt: -1 }).limit(12),
+        routeModel.find({}).populate('driver', 'name email role profile_photo isAvailable').sort({ createdAt: -1 }).limit(12),
+        bookingNewModel.find({}).populate('studentId', 'name email profile_photo').populate('busId').sort({ createdAt: -1 }).limit(12),
+        bookingModel.find({}).populate('parent_id', 'name email profile_photo').populate('driver_id', 'name email profile_photo').populate('route_id').populate('trip_id').populate('vehicle').sort({ createdAt: -1 }).limit(12),
+        paymentModel.aggregate([
+          { $match: { paymentStatus: 'Paid' } },
+          { $group: { _id: null, total: { $sum: '$amount' } } }
+        ]),
+        bookingNewModel.find({}).populate('studentId', 'name email profile_photo').populate('busId').sort({ createdAt: -1 }).limit(5),
+        paymentModel.find({}).populate('studentId', 'name email profile_photo').sort({ createdAt: -1 }).limit(5)
+      ]);
+
+      const totalBookings = modernBookings.length + legacyBookings.length;
+      const pendingBookings = modernBookings.filter((booking) => ['Pending', 'Payment Pending'].includes(booking.bookingStatus)).length
+        + legacyBookings.filter((booking) => booking.status === 'pending').length;
+      const completedBookings = modernBookings.filter((booking) => booking.bookingStatus === 'Confirmed').length
+        + legacyBookings.filter((booking) => booking.status === 'completed').length;
+      const todaysBookings = modernBookings.filter((booking) => new Date(booking.createdAt) >= today).length
+        + legacyBookings.filter((booking) => new Date(booking.createdAt) >= today).length;
+      const activeBuses = buses.filter(isBusActive).length;
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          user,
+          roleProfile,
+          notifications,
+          stats: {
+            totalDrivers,
+            totalParents,
+            totalBuses,
+            totalRoutes,
+            activeBuses,
+            activeDrivers,
+            totalBookings,
+            pendingBookings,
+            completedBookings,
+            todaysBookings,
+            revenue: revenueSummary?.[0]?.total || 0
+          },
+          recentBookings: recentBookings.map(mapBookingModel),
+          recentBuses: buses.slice(0, 5),
+          recentRoutes: routes.slice(0, 5),
+          recentPayments
+        }
+      });
+    }
+
+    const bookingQuery = user.role === 'parent'
+      ? { parent_id: userId }
+      : { studentId: userId };
+
+    const bookingPromise = user.role === 'parent'
+      ? bookingModel.find(bookingQuery).populate('route_id').populate('vehicle').populate('driver_id', 'name email phone_number profile_photo').sort({ createdAt: -1 })
+      : bookingNewModel.find(bookingQuery).populate('busId').sort({ createdAt: -1 });
+
+    const [bookings, buses, routes] = await Promise.all([
+      bookingPromise,
+      busModel.find({}).sort({ createdAt: -1 }).limit(12),
+      routeModel.find({}).populate('driver', 'name email role profile_photo isAvailable').sort({ createdAt: -1 }).limit(12)
+    ]);
+
+    const normalizedBookings = bookings.map(mapBookingModel);
+    const latestBooking = normalizedBookings[0] || null;
+    const latestBookingDoc = bookings[0] || null;
+    const latestBus = latestBookingDoc?.busId || latestBookingDoc?.vehicle || null;
+    const assignedBus = user.role === 'parent'
+      ? latestBooking?.bus || latestBooking?.vehicle || null
+      : latestBookingDoc?.busId || buses[0] || null;
+    const confirmedBookings = user.role === 'parent'
+      ? normalizedBookings.filter((booking) => booking.status === 'accepted' || booking.status === 'completed')
+      : normalizedBookings.filter((booking) => booking.bookingStatus === 'Confirmed');
+    const pendingBookings = normalizedBookings.filter((booking) => booking.status === 'pending' || booking.bookingStatus === 'Pending' || booking.bookingStatus === 'Payment Pending');
+    const cancelledBookings = normalizedBookings.filter((booking) => booking.status === 'rejected' || booking.bookingStatus === 'Cancelled');
+    const liveBus = buses.find(isBusActive) || buses[0] || null;
+    const routeInfo = user.role === 'parent'
+      ? latestBooking?.route || null
+      : latestBookingDoc?.busId?.route || latestBooking?.bus?.routeName || latestBooking?.route || null;
+
+    const rideSummary = user.role === 'parent'
+      ? {
+          fromLabel: 'From Home',
+          fromAddress: roleProfile?.pickup_address || latestBookingDoc?.pickup_point || 'Pickup location pending',
+          toLabel: 'To School',
+          toAddress: roleProfile?.school_name || roleProfile?.drop_address || latestBookingDoc?.drop_point || 'School destination pending',
+          pickupTime: latestBookingDoc?.createdAt ? new Date(latestBookingDoc.createdAt).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : 'Pending'
+        }
+      : {
+          fromLabel: 'Pickup Stop',
+          fromAddress: latestBooking?.pickupStop || latestBooking?.pickupPoint || roleProfile?.pickup_address || 'Pickup stop pending',
+          toLabel: 'Destination',
+          toAddress: latestBooking?.dropStop || latestBooking?.dropPoint || roleProfile?.school_name || 'School destination pending',
+          pickupTime: latestBookingDoc?.createdAt ? new Date(latestBookingDoc.createdAt).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : 'Pending'
+        };
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        user,
+        roleProfile,
+        notifications,
+        stats: {
+          totalRides: normalizedBookings.length,
+          confirmedRides: confirmedBookings.length,
+          pendingRides: pendingBookings.length,
+          cancelledRides: cancelledBookings.length,
+          unreadNotifications: notifications.filter((item) => !item.read).length
+        },
+        dashboard: {
+          welcomeName: user.name,
+          welcomeRole: user.role,
+          profilePhoto: user.profile_photo,
+          upcomingRide: latestBooking,
+          assignedBus,
+          routeInfo,
+          rideSummary,
+          wallet: {
+            balance: user.role === 'student' ? 0 : Math.max(0, pendingBookings.length * 250),
+            lastActivity: latestBooking?.updatedAt || user.updatedAt
+          },
+          liveBus,
+          recentActivity: normalizedBookings.slice(0, 4),
+          liveBuses: buses.filter(isBusActive).slice(0, 6),
+          availableRoutes: routes.slice(0, 6)
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get Dashboard Overview Error:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const getAssignmentOptions = async (req, res) => {
+  try {
+    const allowReassignment = String(req.query.allowReassignment || 'false').toLowerCase() === 'true';
+    const [drivers, buses, routes] = await Promise.all([
+      getEligibleDrivers({ allowReassignment }),
+      busModel.find({}).populate('driver', 'name email role isAvailable profile_photo').populate('route').sort({ createdAt: -1 }),
+      routeModel.find({}).populate('driver', 'name email role isAvailable profile_photo').populate('assignedBus').sort({ createdAt: -1 })
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        drivers,
+        buses,
+        routes
+      }
+    });
+  } catch (error) {
+    console.error('Get Assignment Options Error:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
