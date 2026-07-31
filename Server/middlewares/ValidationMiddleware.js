@@ -13,8 +13,13 @@ const ValidationMiddleware = (schema, source = 'body') => {
             });
         }
 
-        // Replace the request map with validated sanitised values
-        req[source] = value;
+        // Express 5 exposes req.query as a read-only getter, so keep validated
+        // query values on a separate property instead of assigning to req.query.
+        if (source === 'query') {
+            req.validatedQuery = value;
+        } else {
+            req[source] = value;
+        }
         next();
     };
 };
