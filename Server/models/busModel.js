@@ -1,11 +1,29 @@
 import mongoose from 'mongoose';
 
 const busSchema = new mongoose.Schema({
+  driver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    default: null,
+    index: true
+  },
+  route: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'route',
+    default: null,
+    index: true
+  },
   busNumber: {
     type: String,
     required: true,
     unique: true,
     trim: true,
+    index: true
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'maintenance'],
+    default: 'active',
     index: true
   },
   totalSeats: {
