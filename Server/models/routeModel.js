@@ -6,6 +6,18 @@ const routeSchema = new mongoose.Schema({
     ref: 'user',
     required: true
   },
+  assignedBus: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'bus',
+    default: null,
+    index: true
+  },
+  route_name: {
+    type: String,
+    default: '',
+    trim: true,
+    index: true
+  },
   start_location: {
     type: String,
     required: true
@@ -18,6 +30,14 @@ const routeSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  coordinates: {
+    type: [{
+      latitude: Number,
+      longitude: Number,
+      label: String
+    }],
+    default: []
+  },
   start_coords: {
     lat: { type: Number },
     lon: { type: Number }
@@ -25,6 +45,10 @@ const routeSchema = new mongoose.Schema({
   end_coords: {
     lat: { type: Number },
     lon: { type: Number }
+  },
+  estimated_time_minutes: {
+    type: Number,
+    default: 0
   },
   distance_km: {
     type: Number,
