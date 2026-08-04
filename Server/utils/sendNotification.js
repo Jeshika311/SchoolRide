@@ -1,6 +1,7 @@
 import admin, { isFirebaseReady } from '../config/firebase.js';
 import notificationModel from '../models/notificationModel.js';
 import userModel from '../models/userModel.js';
+import { emitToUser } from '../sockets/socketManager.js';
 
 const DELIVERY_STATUS = {
 	SENT: 'sent',
@@ -73,6 +74,16 @@ export const sendNotificationToUser = async ({
 		data,
 		deliveryStatus,
 		deliveryMessage
+	});
+
+	emitToUser(userId, 'new_notification', {
+		id: notification._id,
+		title,
+		message,
+		type,
+		data,
+		createdAt: notification.createdAt,
+		read: false
 	});
 
 	return {
