@@ -8,6 +8,8 @@ import {
   updateDriverProfile,
   updateDriverAvailability,
   getDriverDashboard,
+  getDashboardOverview,
+  getAssignmentOptions,
   changeLanguage,
   deleteAccount,
   createSupportTicket,
@@ -31,6 +33,8 @@ userRouter.get('/getDriverProfile', AuthMiddleware, getDriverProfile);
 userRouter.put('/updateDriverProfile', AuthMiddleware, updateDriverProfile);
 userRouter.put('/updateDriverAvailability', AuthMiddleware, RoleMiddleware('driver'), updateDriverAvailability);
 userRouter.get('/driver-dashboard', AuthMiddleware, RoleMiddleware('driver'), getDriverDashboard);
+userRouter.get('/dashboard-overview', AuthMiddleware, getDashboardOverview);
+userRouter.get('/assignment-options', AuthMiddleware, RoleMiddleware('admin'), getAssignmentOptions);
 
 // misc
 userRouter.put('/changeLanguage', AuthMiddleware, changeLanguage);
