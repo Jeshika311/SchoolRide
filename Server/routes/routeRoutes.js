@@ -1,5 +1,5 @@
 import express from 'express';
-import { createRoute, getRoutes, getRouteById, deleteRoute } from '../controllers/routeController.js';
+import { createRoute, getRoutes, getRouteById, updateRoute, deleteRoute } from '../controllers/routeController.js';
 import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 import RoleMiddleware from '../middlewares/RoleMiddleware.js';
 
@@ -14,6 +14,7 @@ routeRouter.route('/')
 
 routeRouter.route('/:id')
     .get(getRouteById)
+    .put(RoleMiddleware('admin', 'manager'), updateRoute)
     .delete(RoleMiddleware('admin', 'manager'), deleteRoute);
 
 export default routeRouter;
